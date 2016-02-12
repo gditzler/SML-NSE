@@ -1,93 +1,56 @@
-function [err_sml, err_mle, err_map, err_avg_cor, err_avg, err_cvx, kappa_sml, ...
-  kappa_mle, kappa_map, kappa_avg_cor, kappa_avg, kappa_cvx, time_sml, time_mle, ...
-  time_map, time_avg_cor, time_avg, time_cvx] = incremental_learner(data_tr, ...
-  data_te, labels_tr, labels_te, clfr, max_learners)
-  %
-  if ~(iscell(data_tr) && iscell(data_te) && iscell(labels_te) && iscell(labels_tr))
-    error('data and labels must be cell arrays.')
-  end
-  if isnan(max_learners)
-    max_learners = length(data_tr);
-  end
-  
-  calc_error = @(x, y) sum(x ~= y)/numel(y);
-  
-  alpha = 0.1:.1:.9; % cvx combiner 
-  
-  T = length(data_te);
-  
-  % initalize variables
-  err_sml = zeros(T, 1);
-  err_mle = zeros(T, 1);
-  err_map = zeros(T, 1);
-  err_avg_cor = zeros(T, 1); 
-  err_avg = zeros(T, 1);
-  err_cvx = zeros(T, length(alpha));
-  
-  time_sml = zeros(T, 1);
-  time_mle = zeros(T, 1);
-  time_map = zeros(T, 1);
-  time_avg_cor = zeros(T, 1); 
-  time_avg = zeros(T, 1);
-  time_cvx = zeros(T, length(alpha));
-  
-  kappa_sml = zeros(T, 1);
-  kappa_mle = zeros(T, 1);
-  kappa_map = zeros(T, 1);
-  kappa_avg_cor = zeros(T, 1); 
-  kappa_avg = zeros(T, 1);
-  kappa_cvx = zeros(T, length(alpha));
-  ensemble = {}; %cell(max_learners, 1);
-  
-  % main loop 
-  for t = 1:T-1
-    tic;     
-    tt = mod(t, max_learners); % location of current learner
-    ensemble{tt} = classifier_train(clfr, data_tr{t}, labels_tr{t});
-    preds_te = predictions(ensemble, data_te{t});
-    preds_te(preds_te == 2) = -1;
-    base_time = toc;
-    
-    if t > 1
-      % SML
-      [p_sml, ~, p_mle, p_map, ~, times_sml, times_mle, times_map] = spectral_meta_learner(preds_te);
-      p_sml(p_sml == -1) = 2;
-      p_mle(p_mle == -1) = 2;
-      p_map(p_map == -1) = 2;
-      err_sml(t) = calc_error(p_sml, labels_te{t});
-      err_mle(t) = calc_error(p_mle, labels_te{t});
-      err_map(t) = calc_error(p_map, labels_te{t});
-      
-      kappa_sml(t) = kappa(confusionmat(labels_te{t}, p_sml));
-      kappa_mle(t) = kappa(confusionmat(labels_te{t}, p_mle));
-      kappa_map(t) = kappa(confusionmat(labels_te{t}, p_map));
-      
-      time_sml(t) = times_sml+base_time;
-      time_mle(t) = times_mle+base_time;
-      time_map(t) = times_map+base_time;
-      
+function [errors, kappas, timers] = incremental_learner(data_tr, data_te, labels_tr, labels_te, clfr, max_learners, model_type)
+%
 
-      % AVG + AVG-Corrected
-      [p_avg1, p_avg2, time_avg1, time_avg2] = average_meta_learner(preds_te);
-      p_avg1(p_avg1 == -1) = 2;
-      p_avg2(p_avg2 == -1) = 2;
-      err_avg(t) = calc_error(p_avg1, labels_te{t});
-      err_avg_cor(t) = calc_error(p_avg2, labels_te{t});
-      
-      kappa_avg(t) = kappa(confusionmat(labels_te{t}, p_avg1));
-      kappa_avg_cor(t) = kappa(confusionmat(labels_te{t}, p_avg2));
-      
-      time_avg_cor(t) = time_avg1+base_time; 
-      time_avg(t) = time_avg2+base_time;
+if (~(iscell(data_tr) && iscell(data_te) ...
+    && iscell(labels_te) && iscell(labels_tr)))
+  error('data and labels must be cell arrays.')
+end
 
+if isnan(max_learners)
+  max_learners = length(data_tr);
+end
+
+calc_error = @(x, y) sum(x ~= y)/numel(y);
+
+T = length(data_te);
+
+% initalize variables
+errors = zeros(T, 1);
+timers = zeros(T, 1);
+kappas = zeros(T, 1);
+ensemble = {}; 
+
+% main loop 
+for t = 1:T-1
+  tic;     
+  
+  tt = mod(t-1, max_learners)+1; % location of current learner
+  ensemble{tt} = classifier_train(clfr, data_tr{t}, labels_tr{t});
+  preds_te = predictions(ensemble, data_te{t});
+  preds_te(preds_te == 2) = -1;
+
+  if t > 1
     
+    switch model_type
+      case 'sml'
+        yhat = vote_sml(preds_te);
+      case 'mle'
+        yhat = vote_mle(preds_te);
+      case 'map'
+        HyhatL = vote_map(preds_te);
+      case 'avg1'
+        yhat = vote_avg1(preds_te);
+      case 'avg2'
+        yhat = vote_avg1(preds_te);
+      otherwise
+        error('Unknown model type.')
     end
-  
+    
+    yhat(yhat == -1) = 2;
+    errors(t) = calc_error(yhat, labels_te{t});
+    kappas(t) = kappa(confusionmat(labels_te{t}, yhat));
+    timers(t) = toc;
   end
 end
 
-function H = predictions(ensemble, data)
-  for j = 1:length(ensemble)
-    H(:, j) = classifier_test(ensemble{j}, data);
-  end
-end
+
