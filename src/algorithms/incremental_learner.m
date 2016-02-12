@@ -41,7 +41,7 @@ for t = 1:T-1
       case 'avg1'
         yhat = vote_avg1(preds_te);
       case 'avg2'
-        yhat = vote_avg1(preds_te);
+        yhat = vote_avg2(preds_te);
       otherwise
         error('Unknown model type.')
     end

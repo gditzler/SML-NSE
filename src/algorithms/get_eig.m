@@ -20,7 +20,7 @@ function V = get_eig(X)
     R_wgs = -R_wgs; 
   end
 
-  V = R_wgs;
+  V = abs(R_wgs);
 end
 
 function [VMAT] = varcov(CMAT, S)

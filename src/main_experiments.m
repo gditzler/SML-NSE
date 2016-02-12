@@ -3,10 +3,13 @@ clear;
 close all;
 
 addpath('data/')
-avg = 20; 
-dats = {'poker', 'noaa', 'elec2', 'spam', 'sea', 'air'};
-parpool(avg);
-% dats = { 'spam'};
+avg = 25; 
+dats = { 'noaa', 'poker', 'elec2', 'spam', 'sea', 'air', ...
+  'rbf-01.arff', 'rbf-001.arff', 'rbf-0001.arff'};
+alpha = .7;
+beta = .5;
+%parpool(avg);
+
 
 for dd = 1:length(dats)
   dat = dats{dd};
@@ -112,7 +115,11 @@ for dd = 1:length(dats)
     win_size = win_size-1;
     
   else
-    error('Unknown data.')
+    data = load(dat);
+    allclass = data(:, end)+1;
+    alldata = data(:, 1:end-1);    
+    win_size = numel(labels)/2000;
+    clear data
     
   end
 
@@ -135,7 +142,8 @@ for dd = 1:length(dats)
   err_avg_cor = zeros(length(data_train), avg); 
   err_avg = zeros(length(data_train), avg); 
   err_ftl = zeros(length(data_train), avg); 
-  err_nse = zeros(length(data_train), avg); 
+  err_nse = zeros(length(data_train), avg);
+  err_cvx = zeros(length(data_train), avg);
 
   kappa_sml = zeros(length(data_train), avg); 
   kappa_mle = zeros(length(data_train), avg); 
@@ -143,7 +151,8 @@ for dd = 1:length(dats)
   kappa_avg_cor = zeros(length(data_train), avg); 
   kappa_avg = zeros(length(data_train), avg); 
   kappa_ftl = zeros(length(data_train), avg); 
-  kappa_nse = zeros(length(data_train), avg); 
+  kappa_nse = zeros(length(data_train), avg);
+  kappa_cvx = zeros(length(data_train), avg);
   
   time_sml = zeros(length(data_train), avg); 
   time_mle = zeros(length(data_train), avg); 
@@ -151,9 +160,10 @@ for dd = 1:length(dats)
   time_avg_cor = zeros(length(data_train), avg); 
   time_avg = zeros(length(data_train), avg); 
   time_ftl = zeros(length(data_train), avg); 
-  time_nse = zeros(length(data_train), avg); 
+  time_nse = zeros(length(data_train), avg);
+  time_cvx = zeros(length(data_train), avg);
 
-  parfor i = 1:avg
+  for i = 1:avg
     disp(['  -Avg ', num2str(i), '/', num2str(avg)]);
 
     [data_train, data_test, labels_train, labels_test] = test_then_train(alldata, ...
@@ -167,29 +177,31 @@ for dd = 1:length(dats)
     [err_nse(:,i), kappa_nse(:,i), time_nse(:, i)] = learn_nse(netNSE, data_train, labels_train, ...
       data_test, labels_test);
 
-    disp('     >SML, MLE, MAP, AVG')
-    [err_sml(:,i), err_mle(:,i), err_map(:,i), err_avg_cor(:,i), err_avg(:,i), ~, ...
-      kappa_sml(:,i), kappa_mle(:,i), kappa_map(:,i), kappa_avg_cor(:,i), ...
-      kappa_avg(:,i), ~, time_sml(:,i), time_mle(:,i), time_map(:,i), ...
-      time_avg_cor(:,i), time_avg(:,i), ~] = incremental_learner(data_train, ...
-      data_test, labels_train, labels_test, model, max_learners);
+    disp('     >SML')
+    [err_sml(:,i), kappa_sml(:,i), time_sml(:,i)] = incremental_learner(data_train, ...
+      data_test, labels_train, labels_test, model, max_learners, 'sml');
+    
+    disp('     >MLE')
+    [err_mle(:,i), kappa_mle(:,i), time_mle(:,i)] = incremental_learner(data_train, ...
+      data_test, labels_train, labels_test, model, max_learners, 'mle');
+    
+    disp('     >MAP')
+    [err_map(:,i), kappa_map(:,i), time_map(:,i)] = incremental_learner(data_train, ...
+      data_test, labels_train, labels_test, model, max_learners, 'map');
+     
+    disp('     >AVG1')
+    [err_avg(:,i), kappa_avg(:,i), time_avg(:,i)] = incremental_learner(data_train, ...
+      data_test, labels_train, labels_test, model, max_learners, 'avg1');
+    
+    disp('     >AVG2')
+    [err_avg_cor(:,i), kappa_avg_cor(:,i), time_avg_cor(:,i)] = incremental_learner(data_train, ...
+      data_test, labels_train, labels_test, model, max_learners, 'avg2');
+    
+    disp('     >CVX')
+    [err_cvx(:,i), kappa_cvx(:,i), time_cvx(:,i)] = cvx_learner(data_train, ...
+      data_test, labels_train, labels_test, model, max_learners, alpha, beta);
   end
   
-%   err_sml = mean(err_sml, 2); 
-%   err_mle = mean(err_mle, 2); 
-%   err_map = mean(err_map, 2); 
-%   err_avg_cor = mean(err_avg_cor, 2); 
-%   err_avg = mean(err_avg, 2);
-%   err_nse = mean(err_nse, 2); 
-%   err_ftl = mean(err_ftl, 2);
-% 
-%   kappa_sml = mean(kappa_sml, 2); 
-%   kappa_mle = mean(kappa_mle, 2); 
-%   kappa_map = mean(kappa_map, 2); 
-%   kappa_avg_cor = mean(kappa_avg_cor, 2); 
-%   kappa_avg = mean(kappa_avg, 2); 
-%   kappa_nse = mean(kappa_nse, 2); 
-%   kappa_ftl = mean(kappa_ftl, 2);
 
 
   save(['../results/', dat, '_err_kappa.mat']);
