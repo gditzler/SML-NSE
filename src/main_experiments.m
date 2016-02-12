@@ -8,7 +8,7 @@ dats = { 'noaa', 'poker', 'elec2', 'spam', 'sea', 'air', ...
   'rbf-01.arff', 'rbf-001.arff', 'rbf-0001.arff'};
 alpha = .7;
 beta = .5;
-%parpool(avg);
+parpool(avg);
 
 
 for dd = 1:length(dats)
@@ -163,7 +163,7 @@ for dd = 1:length(dats)
   time_nse = zeros(length(data_train), avg);
   time_cvx = zeros(length(data_train), avg);
 
-  for i = 1:avg
+  parfor i = 1:avg
     disp(['  -Avg ', num2str(i), '/', num2str(avg)]);
 
     [data_train, data_test, labels_train, labels_test] = test_then_train(alldata, ...

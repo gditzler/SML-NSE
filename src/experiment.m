@@ -2,7 +2,7 @@ clc;
 clear;
 close all;
 
-    load chessIZ
+    load spam2.mat
     alldata = alldata';   % old format of data needs transpose
     allclass = allclass'; % ^^^^^
 
