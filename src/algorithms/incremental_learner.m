@@ -80,7 +80,6 @@ function [err_sml, err_mle, err_map, err_avg_cor, err_avg, err_cvx, kappa_sml, .
       time_avg_cor(t) = time_avg1+base_time; 
       time_avg(t) = time_avg2+base_time;
 
-      % CVX
     
     end
   
