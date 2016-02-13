@@ -37,7 +37,7 @@ for t = 1:T-1
       case 'mle'
         yhat = vote_mle(preds_te);
       case 'map'
-        HyhatL = vote_map(preds_te);
+        yhat = vote_map(preds_te);
       case 'avg1'
         yhat = vote_avg1(preds_te);
       case 'avg2'
