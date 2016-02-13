@@ -2,7 +2,11 @@ clc;
 clear; 
 close all;
 
-addpath('data/')
+
+addpath('algorithms/');
+addpath('utils/');
+addpath('data/');
+
 avg = 25; 
 dats = { 'noaa', 'poker', 'elec2', 'spam', 'sea', 'air', ...
   'rbf-01.arff', 'rbf-001.arff', 'rbf-0001.arff'};
