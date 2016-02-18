@@ -8,8 +8,9 @@ addpath('utils/');
 addpath('data/');
 
 avg = 25; 
-dats = { 'noaa', 'poker', 'elec2', 'spam', 'sea', 'air', ...
-  'rbf-01.arff', 'rbf-001.arff', 'rbf-0001.arff'};
+dats = { 'rbf-01.arff', 'rbf-001.arff', 'rbf-0001.arff'};
+%dats = { 'noaa', 'poker', 'elec2', 'spam', 'sea', 'air', ...
+%  'rbf-01.arff', 'rbf-001.arff', 'rbf-0001.arff'};
 alpha = .7;
 beta = .5;
 parpool(avg);
@@ -122,7 +123,8 @@ for dd = 1:length(dats)
     data = load(dat);
     allclass = data(:, end)+1;
     alldata = data(:, 1:end-1);    
-    win_size = numel(labels)/2000;
+    win_size = numel(allclass)/2000;
+    mclass = length(unique(allclass));
     clear data
     
   end
