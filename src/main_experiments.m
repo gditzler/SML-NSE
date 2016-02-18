@@ -14,6 +14,8 @@ alpha = .7;
 beta = .5;
 parpool(avg);
 
+end_experiment = 0;
+
 
 for dd = 1:length(dats)
   dat = dats{dd};
@@ -127,8 +129,13 @@ for dd = 1:length(dats)
     
   end
 
-  [data_train, data_test, labels_train, labels_test] = test_then_train(alldata, allclass, win_size, true);
-
+  if end_experiment == 1
+    [data_train, data_test, labels_train, labels_test] = test_on_last(alldata, allclass, win_size, true);
+  else
+    [data_train, data_test, labels_train, labels_test] = test_then_train(alldata, allclass, win_size, true);
+  end
+  
+  
   max_learners = length(data_train) + 1;
   model.type = 'CART';             % base classifier
   netFTL.mclass = mclass;          % number of classes in the prediciton problem
@@ -170,8 +177,11 @@ for dd = 1:length(dats)
   parfor i = 1:avg
     disp(['  -Avg ', num2str(i), '/', num2str(avg)]);
 
-    [data_train, data_test, labels_train, labels_test] = test_then_train(alldata, ...
-      allclass, win_size, true);
+    if end_experiment == 1
+      [data_train, data_test, labels_train, labels_test] = test_on_last(alldata, allclass, win_size, true);
+    else
+      [data_train, data_test, labels_train, labels_test] = test_then_train(alldata, allclass, win_size, true);
+    end
 
     disp('     >FTL')
     [err_ftl(:,i), kappa_ftl(:,i), time_ftl(:,i)] = follow_the_leader(netFTL, data_train, ...
@@ -206,9 +216,12 @@ for dd = 1:length(dats)
       data_test, labels_train, labels_test, model, max_learners, alpha, beta);
   end
   
+  if end_experiment == 1
+    save(['../results/', dat, '_END_err_kappa.mat']);
+  else
+    save(['../results/', dat, '_err_kappa.mat']);
+  end
 
-
-  save(['../results/', dat, '_err_kappa.mat']);
 end
 
 delete(gcp('nocreate'));
