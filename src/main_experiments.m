@@ -7,14 +7,14 @@ addpath('algorithms/');
 addpath('utils/');
 addpath('data/');
 
-avg = 5; 
+avg = 10; 
 % dats = { 'rbf-01.arff', 'rbf-001.arff', 'rbf-0001.arff'};
 dats = { 'noaa', 'poker', 'elec2', 'spam', 'sea', 'air'};
 alpha = .7;
 beta = .5;
-parpool(2);
+parpool(avg);
 
-end_experiment = 0;
+end_experiment = 1;
 
 
 for dd = 1:length(dats)
