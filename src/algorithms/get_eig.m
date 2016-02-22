@@ -20,7 +20,8 @@ function V = get_eig(X)
     R_wgs = -R_wgs; 
   end
 
-  V = abs(R_wgs);
+  V = R_wgs;
+  % map min max V
 end
 
 function [VMAT] = varcov(CMAT, S)
