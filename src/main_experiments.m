@@ -12,7 +12,7 @@ avg = 10;
 dats = { 'noaa', 'poker', 'elec2', 'spam', 'sea', 'air'};
 alpha = .7;
 beta = .5;
-parpool(avg);
+%parpool(avg);
 
 end_experiment = 1;
 
@@ -203,7 +203,7 @@ for dd = 1:length(dats)
   time_nse25 = zeros(length(data_train), avg);
   time_cvx25 = zeros(length(data_train), avg);
 
-  parfor i = 1:avg
+  for i = 1:avg
     disp(['  -Avg ', num2str(i), '/', num2str(avg)]);
 
     if end_experiment == 1
@@ -212,33 +212,33 @@ for dd = 1:length(dats)
       [data_train, data_test, labels_train, labels_test] = test_then_train(alldata, allclass, win_size, true);
     end
 
-    disp('     >FTL')
-    [err_ftl(:,i), kappa_ftl(:,i), time_ftl(:,i)] = follow_the_leader(netFTL, data_train, ...
-      labels_train, data_test, labels_test);
-
-    disp('     >NSE')
-    [err_nse(:,i), kappa_nse(:,i), time_nse(:, i)] = learn_nse(netNSE, data_train, labels_train, ...
-      data_test, labels_test);
-
-    disp('     >SML')
-    [err_sml(:,i), kappa_sml(:,i), time_sml(:,i)] = incremental_learner(data_train, ...
-      data_test, labels_train, labels_test, model, max_learners, 'sml');
-    
-    disp('     >MLE')
-    [err_mle(:,i), kappa_mle(:,i), time_mle(:,i)] = incremental_learner(data_train, ...
-      data_test, labels_train, labels_test, model, max_learners, 'mle');
-    
-    disp('     >MAP')
-    [err_map(:,i), kappa_map(:,i), time_map(:,i)] = incremental_learner(data_train, ...
-      data_test, labels_train, labels_test, model, max_learners, 'map');
-     
-    disp('     >AVG1')
-    [err_avg(:,i), kappa_avg(:,i), time_avg(:,i)] = incremental_learner(data_train, ...
-      data_test, labels_train, labels_test, model, max_learners, 'avg1');
-    
-    disp('     >AVG2')
-    [err_avg_cor(:,i), kappa_avg_cor(:,i), time_avg_cor(:,i)] = incremental_learner(data_train, ...
-      data_test, labels_train, labels_test, model, max_learners, 'avg2');
+%     disp('     >FTL')
+%     [err_ftl(:,i), kappa_ftl(:,i), time_ftl(:,i)] = follow_the_leader(netFTL, data_train, ...
+%       labels_train, data_test, labels_test);
+% 
+%     disp('     >NSE')
+%     [err_nse(:,i), kappa_nse(:,i), time_nse(:, i)] = learn_nse(netNSE, data_train, labels_train, ...
+%       data_test, labels_test);
+% 
+%     disp('     >SML')
+%     [err_sml(:,i), kappa_sml(:,i), time_sml(:,i)] = incremental_learner(data_train, ...
+%       data_test, labels_train, labels_test, model, max_learners, 'sml');
+%     
+%     disp('     >MLE')
+%     [err_mle(:,i), kappa_mle(:,i), time_mle(:,i)] = incremental_learner(data_train, ...
+%       data_test, labels_train, labels_test, model, max_learners, 'mle');
+%     
+%     disp('     >MAP')
+%     [err_map(:,i), kappa_map(:,i), time_map(:,i)] = incremental_learner(data_train, ...
+%       data_test, labels_train, labels_test, model, max_learners, 'map');
+%      
+%     disp('     >AVG1')
+%     [err_avg(:,i), kappa_avg(:,i), time_avg(:,i)] = incremental_learner(data_train, ...
+%       data_test, labels_train, labels_test, model, max_learners, 'avg1');
+%     
+%     disp('     >AVG2')
+%     [err_avg_cor(:,i), kappa_avg_cor(:,i), time_avg_cor(:,i)] = incremental_learner(data_train, ...
+%       data_test, labels_train, labels_test, model, max_learners, 'avg2');
     
     disp('     >CVX')
     [err_cvx(:,i), kappa_cvx(:,i), time_cvx(:,i)] = cvx_learner(data_train, ...

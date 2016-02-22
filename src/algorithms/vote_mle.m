@@ -1,4 +1,4 @@
-function MLE = vote_mle(X)
+function [MLE, psi, eta] = vote_mle(X)
   X = sign(X);
   p0 = sum(X(:) == 1)./sum(X(:) ~= 0);
   X(X == 0) = 2.*(rand(sum(X(:) == 0),1) > (1 - p0)) - 1;
@@ -23,7 +23,7 @@ function MLE = vote_mle(X)
   HL = sign(X * R_wgs);
   
   %iterative MLE
-  MLE = iMLE(X, HL);
+  [MLE, ~, psi, eta] = iMLE(X, HL);
   
 end
 
@@ -102,7 +102,7 @@ end
 
 
 
-function [YMLE, Nsteps] = iMLE(Y, Y0)
+function [YMLE, Nsteps, psi, eta] = iMLE(Y, Y0)
   YBCK = 0.*Y0;
   YMLE = Y0;
   Nsteps = 0;
