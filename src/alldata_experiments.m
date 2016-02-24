@@ -16,6 +16,7 @@ datasets = {'a8a', 'german', 'magic04', 'spambase', 'splice', 'svmguide3', ...
 alpha = .7;
 beta = .5;
 parpool(avg);
+mclass = 2;
 
 end_experiment = 0;
 
