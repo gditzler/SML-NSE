@@ -17,7 +17,8 @@ for qq = 1:length(dats2)
   
   range = 2:size(err_avg,1)-2;
   
-  err_sml = nanmean(err_sml, 2); 
+  err_sml = nanmean(err_sml, 2);
+  err_cvx = nanmean(err_cvx, 2);
   err_mle = nanmean(err_mle, 2); 
   err_map = nanmean(err_map, 2); 
   err_avg_cor = nanmean(err_avg_cor, 2); 
@@ -32,11 +33,13 @@ for qq = 1:length(dats2)
 %     mean(err_ftl(range,:))]];
   errs = [errs; ...
     [nanmean(err_sml(range,:)), ...
+    nanmean(err_cvx(range,:)), ...
     nanmean(err_avg_cor(range,:)), ...
     nanmean(err_nse(range,:)), ...
     nanmean(err_ftl(range,:))]];
 
   kappa_sml = nanmean(kappa_sml, 2); 
+  kappa_cvx = nanmean(kappa_cvx, 2);
   kappa_mle = nanmean(kappa_mle, 2); 
   kappa_map = nanmean(kappa_map, 2); 
   kappa_avg_cor = nanmean(kappa_avg_cor, 2); 
@@ -52,12 +55,13 @@ for qq = 1:length(dats2)
 %     mean(kappa_ftl(range,:))]];
   kapp = [kapp; ...
     [nanmean(kappa_sml(range,:)), ...
+    nanmean(kappa_cvx(range,:)), ...
     nanmean(kappa_avg_cor(range,:)), ...
     nanmean(kappa_nse(range,:)), ...
     nanmean(kappa_ftl(range,:))]];
   
 end
-alg = 'SML & AVG & NSE & FTL';
+alg = 'SML & CVX & AVG & NSE & FTL';
 
 rank_errs = rank_rows(errs);
 rank_errs(end + 1, :) = mean(rank_errs);
