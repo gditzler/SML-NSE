@@ -9,7 +9,7 @@ addpath('data/');
 
 avg = 10; 
 % dats = { 'rbf-01.arff', 'rbf-001.arff', 'rbf-0001.arff'};
-dats = { 'noaa', 'poker', 'elec2', 'spam', 'sea', 'air'};
+dats = {  'air'};
 alpha = .7;
 beta = .5;
 parpool(avg);
