@@ -14,7 +14,7 @@ alpha = .7;
 beta = .5;
 parpool(avg);
 
-end_experiment = 1;
+end_experiment = 0;
 
 
 for dd = 1:length(dats)
