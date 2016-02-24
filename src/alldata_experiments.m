@@ -90,7 +90,7 @@ for dd = 1:length(datasets)
   
   max_learners = length(data_train) + 1;
   model.type = 'CART';             % base classifier
-  netFTL.mclass = mclass;          % number of classes in the prediciton problem
+  netFTL.mclass = 2;          % number of classes in the prediciton problem
   netFTL.base_classifier = model;  % set the base classifier in the net struct
   netFTL.n_classifiers = max_learners;
   netNSE.a = .5;                   % slope parameter to a sigmoid
