@@ -1,6 +1,8 @@
+%% nse
 clc
 clear
 close all
+
 
 dats = {'poker', 'noaa', 'elec2', 'spam', 'sea', 'air'};
 
@@ -115,4 +117,71 @@ for dd = 1:length(dats)
   disp([dat, ' & ', num2str(size(alldata,1)), ' & ', num2str(size(alldata,2)), ...
     ' & ', num2str(round(1000*sum(allclass==1)/numel(allclass))/10), ' & ', ...
     num2str(round(1000*sum(allclass==2)/numel(allclass))/10), '\\'])
+end
+%% se
+clc; 
+clear; 
+close all;
+
+
+datasets = {'a8a', 'german', 'magic04', 'spambase', 'splice', 'svmguide3', ... 
+  'ionosphere', 'ovariancancer', 'arrhythmia', 'sido0',...
+  'miniboone.csv', 'breast-cancer-wisc-diag.csv', 'breast-cancer-wisc-prog.csv', 'chess-krvkp.csv','conn-bench-sonar-mines-rocks.csv',...
+  'connect-4.csv','molec-biol-promoter.csv', 'parkinsons.csv', 'spect_train.csv'};
+
+
+for dd = 1:length(datasets)
+  dat = datasets{dd};
+    
+  if strcmp(datasets{dd}, 'ionosphere')
+    load ionosphere
+    [~,~,y] = unique(Y);
+    allclass = y;
+    alldata(:, 2) = [];
+    
+  elseif strcmp(datasets{dd}, 'ovariancancer')
+    load ovariancancer
+    [~,~,y] = unique(grp);
+    allclass = y;
+    alldata = obs;
+  elseif strcmp(datasets{dd}, 'arrhythmia')
+    load arrhythmia
+    dels = find(Y==16);
+    Y(dels) = [];
+    X(dels, :) = [];
+    X(:, [11,2,14]) = [];
+    z = sum(isnan(X),2);
+    X(z==1, :) = [];
+    Y(z==1) = [];
+    Y(Y~=1) = -1;
+    Y(Y==-1) = 2;
+    data = [Y X];
+    alldata = X;
+    allclass = Y;
+    clear dels Description VarNames X Y z
+  elseif length(findstr('csv', datasets{dd})) > 0
+    data = load(['../../../ClassificationDatasets/csv/', datasets{dd}]);
+    X = data(:, 1:end-1);
+    Y = data(:, end);
+    Y(Y == 0) = 2;
+    X = X(:, std(X)~=0);
+    alldata = X;
+    allclass = Y;
+  else
+    load(['../../../OFSE/data/', datasets{dd}, '.mat'])
+    X = data(:, 2:end);
+    Y = data(:, 1);
+    X = X(:, std(X)~=0);
+    Y(Y==-1) = 2;
+    alldata = X;
+    allclass = Y;
+  end
+  
+  c = sort([round(1000*sum(allclass==1)/numel(allclass))/10 round(1000*sum(allclass==2)/numel(allclass))/10]);
+  %[labels,data] = standardize_data(data);
+  [nos, nof] = size(alldata);
+    disp([strrep(dat,'.csv',''), ' & ', num2str(nos), ' & ', num2str(nof), ...
+    ' & ', num2str(c(2)), ' & ', ...
+    num2str(c(1)), '\\'])
+
 end
