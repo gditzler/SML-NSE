@@ -7,6 +7,10 @@ addpath('algorithms/');
 addpath('utils/');
 addpath('data/');
 
+%     'connect-4.csv'
+%     'ozone.csv'
+
+
 avg = 10; 
 datasets = {
     'adult_train.csv'
@@ -19,7 +23,6 @@ datasets = {
     'chess-krvkp.csv'
     'congressional-voting.csv'
     'conn-bench-sonar-mines-rocks.csv'
-    'connect-4.csv'
     'credit-approval.csv'
     'cylinder-bands.csv'
     'heart-hungarian.csv'
@@ -33,7 +36,6 @@ datasets = {
     'musk-2.csv'
     'oocytes_merluccius_nucleus_4d.csv'
     'oocytes_trisopterus_nucleus_2f.csv'
-    'ozone.csv'
     'pima.csv'
     'ringnorm.csv'
     'spambase.csv'
@@ -202,35 +204,27 @@ for dd = 1:length(datasets)
       [data_train, data_test, labels_train, labels_test] = test_then_train(alldata, allclass, win_size, true);
     end
 
-    disp('     >FTL')
     [err_ftl(:,i), kappa_ftl(:,i), time_ftl(:,i)] = follow_the_leader(netFTL, data_train, ...
       labels_train, data_test, labels_test);
 
-    disp('     >NSE')
     [err_nse(:,i), kappa_nse(:,i), time_nse(:, i)] = learn_nse(netNSE, data_train, labels_train, ...
       data_test, labels_test);
 
-    disp('     >SML')
     [err_sml(:,i), kappa_sml(:,i), time_sml(:,i)] = incremental_learner(data_train, ...
       data_test, labels_train, labels_test, model, max_learners, 'sml');
     
-    disp('     >MLE')
     [err_mle(:,i), kappa_mle(:,i), time_mle(:,i)] = incremental_learner(data_train, ...
       data_test, labels_train, labels_test, model, max_learners, 'mle');
     
-    disp('     >MAP')
     [err_map(:,i), kappa_map(:,i), time_map(:,i)] = incremental_learner(data_train, ...
       data_test, labels_train, labels_test, model, max_learners, 'map');
      
-    disp('     >AVG1')
     [err_avg(:,i), kappa_avg(:,i), time_avg(:,i)] = incremental_learner(data_train, ...
       data_test, labels_train, labels_test, model, max_learners, 'avg1');
     
-    disp('     >AVG2')
     [err_avg_cor(:,i), kappa_avg_cor(:,i), time_avg_cor(:,i)] = incremental_learner(data_train, ...
       data_test, labels_train, labels_test, model, max_learners, 'avg2');
     
-    disp('     >CVX')
     [err_cvx(:,i), kappa_cvx(:,i), time_cvx(:,i)] = cvx_learner(data_train, ...
       data_test, labels_train, labels_test, model, max_learners, alpha, beta);
     
@@ -262,9 +256,9 @@ for dd = 1:length(datasets)
   end
   
   if end_experiment == 1
-    save(['../results/all_', dat, '_END_err_kappa.mat']);
+    save(['../results/all_', strrep(dat,'.csv', ''), '_END_err_kappa.mat']);
   else
-    save(['../results/all_', dat, '_err_kappa.mat']);
+    save(['../results/all_', strrep(dat,'.csv', ''), '_err_kappa.mat']);
   end
 
 end
