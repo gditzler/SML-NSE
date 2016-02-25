@@ -29,7 +29,6 @@ datasets = {
     'ionosphere.csv'
     'magic.csv'
     'mammographic.csv'
-    'miniboone.csv'
     'mushroom.csv'
     'musk-2.csv'
     'oocytes_merluccius_nucleus_4d.csv'
@@ -45,6 +44,7 @@ datasets = {
     'titanic.csv'
     'twonorm.csv'
     'vertebral-column-2clases.csv'
+    'miniboone.csv'
   };
 % dats = {  'air'};
 alpha = .7;
@@ -105,6 +105,10 @@ for dd = 1:length(datasets)
   end
   %[labels,data] = standardize_data(data);
   [nos, nof] = size(alldata);
+  
+  shuffs = randperm(nos);
+  alldata = alldata(shuffs, :);
+  allclass = allclass(shuffs);
   
   if nos < 1000
     win_size = 50;
