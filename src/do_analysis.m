@@ -64,6 +64,11 @@ for qq = 1:length(dats2)
 end
 alg = 'SML & CVX & AVG & NSE & FTL';
 
+
+errs = round(errs*1000)/10;
+kapp = round(kapp*1000)/10;
+
+
 rank_errs = rank_rows(errs);
 rank_errs(end + 1, :) = mean(rank_errs);
 rank_kappa = rank_rows(1 - kapp);
@@ -88,9 +93,9 @@ for i = 1:size(rank_errs, 1)
   s = [dats2{i} ' & '];
   if i ~= size(rank_errs, 1)
     for j = 1:size(rank_errs, 2)-1
-      s = [s, num2str(100*errs(i, j)), ' (',num2str(rank_errs(i, j)),')', ' & '];
+      s = [s, num2str(errs(i, j)), ' (',num2str(rank_errs(i, j)),')', ' & '];
     end
-    disp([s, num2str(100*errs(i, end)), ' (',num2str(rank_errs(i, end)),')', ' \\ '])
+    disp([s, num2str(errs(i, end)), ' (',num2str(rank_errs(i, end)),')', ' \\ '])
   else
     s = [dats2{i} ' & '];
     for j = 1:size(rank_errs, 2)-1
@@ -115,9 +120,9 @@ for i = 1:size(rank_kappa, 1)
   s = [dats2{i} ' & '];
   if i ~= size(rank_kappa, 1)
     for j = 1:size(rank_kappa, 2)-1
-      s = [s, num2str(100*kapp(i, j)), ' (',num2str(rank_kappa(i, j)),')', ' & '];
+      s = [s, num2str(kapp(i, j)), ' (',num2str(rank_kappa(i, j)),')', ' & '];
     end
-    disp([s, num2str(100*kapp(i, end)), ' (',num2str(rank_kappa(i, end)),')', ' \\ '])
+    disp([s, num2str(kapp(i, end)), ' (',num2str(rank_kappa(i, end)),')', ' \\ '])
   else
     s = [dats2{i} ' & '];
     for j = 1:size(rank_kappa, 2)-1
@@ -164,7 +169,7 @@ for file = files'
     continue; 
   end
   load(['../results/', file.name]); 
-  range = 2:size(err_avg, 1)-1;
+  range = 2:size(err_avg, 1)-1;%;2:size(err_avg, 1)-1;
     
   err_sml = mean(nanmean(err_sml(range,:), 2));
   err_map = mean(nanmean(err_map(range,:), 2));
@@ -181,7 +186,7 @@ for file = files'
   kappa_mle = mean(nanmean(kappa_mle(range,:), 2)); 
   kappa_map = mean(nanmean(kappa_map(range,:), 2)); 
   kappa_avg_cor = mean(nanmean(kappa_avg_cor(range,:), 2)); 
-  %kappa_avg = nanmean(kappa_avg, 2); 
+  kappa_avg = mean(nanmean(kappa_avg, 2)); 
   kappa_nse = mean(nanmean(kappa_nse(range,:), 2)); 
   kappa_ftl = mean(nanmean(kappa_ftl(range,:), 2));
   
