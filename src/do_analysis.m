@@ -128,6 +128,7 @@ tail = 'left';
 alpha = .05;
 errs = [];
 kapp = [];
+timers = [];
 dats2 = {};
 files = dir('../results/all*');
 all_errors = [];
@@ -176,13 +177,20 @@ for file = files'
   kappa_nse = mean(nanmean(kappa_nse(range,:), 2)); 
   kappa_ftl = mean(nanmean(kappa_ftl(range,:), 2));
   
+  time_sml = max(csum(nanmean(time_sml(range,:), 2))); 
+  time_cvx = max(csum(nanmean(time_cvx(range,:), 2)));
+  time_mle = max(csum(nanmean(time_mle(range,:), 2))); 
+  time_map = max(csum(nanmean(time_map(range,:), 2))); 
+  time_avg_cor = max(csum(nanmean(time_avg_cor(range,:), 2))); 
+  time_avg = max(csum(nanmean(time_avg, 2))); 
+  time_nse = max(csum(nanmean(time_nse(range,:), 2))); 
+  time_ftl = max(csum(nanmean(time_ftl(range,:), 2)));
+  
   kapp = [kapp; [kappa_sml, kappa_cvx, kappa_avg_cor, kappa_nse, kappa_ftl]];
+  timers = [timers; [time_sml,time_cvx,time_avg_cor, time_nse, time_ftl]];
   dats2{end+1} = strrep(strrep(strrep(strrep(file.name, '.csv_err_kappa.mat', ''), 'all_', ''), '_train', ''), '_', ' ');
 end
 
-
-errs = round(errs*1000)/10;
-kapp = round(kapp*1000)/10;
 
 
 alg = 'SML & CVX & AVG & NSE & FTL';
@@ -196,12 +204,22 @@ alg = 'SML & CVX & AVG & NSE & FTL';
 
 rank_errs = rank_rows(errs);
 rank_errs(end + 1, :) = mean(rank_errs);
+rank_time = rank_rows(timers);
+%rank_time(end + 1, :) = mean(rank_time);
+
 rank_kappa = rank_rows(1 - kapp);
 rank_kappa(end + 1, :) = mean(rank_kappa);
 dats2{end+1} = '';
 
 [hZtest_err, pZtest_err, pFtest_err] = friedman_demsar(errs, tail, alpha);
 [hZtest_kapp, pZtest_kapp, pFtest_kapp] = friedman_demsar(1 - kapp, tail, alpha);
+[hZtest_time, pZtest_time, pFtest_time] = friedman_demsar(timers, tail, alpha);
+
+
+
+errs = round(errs*1000)/10;
+kapp = round(kapp*1000)/10;
+timers = round(timers*1000)/1000;
 
 disp(' ')
 disp('Error Table')
@@ -241,5 +259,21 @@ for i = 1:size(rank_kappa, 1)
     end
     disp([s, num2str(rank_kappa(i, end)), ' \\ '])
   end
+end
+
+
+disp(' ')
+disp('Time Table')
+disp(alg)
+
+for i = 1:size(rank_time, 1)
+  s = [dats2{i} ' & '];
+  for j = 1:size(rank_time, 2)-1
+    q = 100*(timers(i, j)-min(timers(i, :)))/min(timers(i, :));
+    s = [s, num2str(round(q)), ' (',num2str(timers(i, j)),'s)', ' & '];
+  end
+  q = 100*(timers(i, end)-min(timers(i, :)))/min(timers(i, :));
+  disp([s, num2str(round(q)), ' (',num2str(timers(i, end)),'s)', ' \\ '])
+  
 end
 

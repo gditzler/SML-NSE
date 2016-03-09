@@ -194,7 +194,7 @@ for dd = 1:length(datasets)
     allclass = Y;
     clear dels Description VarNames X Y z
   elseif length(findstr('csv', datasets{dd})) > 0
-    data = load(['../../../ClassificationDatasets/csv/', datasets{dd}]);
+    data = load(['../../ClassificationDatasets/csv/', datasets{dd}]);
     X = data(:, 1:end-1);
     Y = data(:, end);
     Y(Y == 0) = 2;
