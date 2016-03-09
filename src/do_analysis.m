@@ -76,13 +76,6 @@ dats2{end+1} = '';
 disp(' ')
 disp('Error Table')
 disp(alg)
-% for i = 1:size(rank_errs, 1)
-%   s = [dats2{i} ' & '];
-%   for j = 1:size(rank_errs, 2)-1
-%     s = [s, num2str(rank_errs(i, j)), ' & '];
-%   end
-%   disp([s, num2str(rank_errs(i, end)), ' \\ '])
-% end
 
 for i = 1:size(rank_errs, 1)
   s = [dats2{i} ' & '];
@@ -103,13 +96,6 @@ end
 disp(' ')
 disp('Kappa Table')
 disp(alg)
-% for i = 1:size(rank_kappa, 1)
-%   s = [dats2{i} ' & '];
-%   for j = 1:size(rank_kappa, 2)-1
-%     s = [s, num2str(rank_kappa(i, j)), ' & '];
-%   end
-%   disp([s, num2str(rank_kappa(i, end)), ' \\ '])
-% end
 
 for i = 1:size(rank_kappa, 1)
   s = [dats2{i} ' & '];
@@ -215,13 +201,6 @@ dats2{end+1} = '';
 disp(' ')
 disp('Error Table')
 disp(alg)
-% for i = 1:size(rank_errs, 1)
-%   s = [dats2{i} ' & '];
-%   for j = 1:size(rank_errs, 2)-1
-%     s = [s, num2str(rank_errs(i, j)), ' & '];
-%   end
-%   disp([s, num2str(rank_errs(i, end)), ' \\ '])
-% end
 
 for i = 1:size(rank_errs, 1)
   s = [dats2{i} ' & '];
@@ -242,13 +221,6 @@ end
 disp(' ')
 disp('Kappa Table')
 disp(alg)
-% for i = 1:size(rank_kappa, 1)
-%   s = [dats2{i} ' & '];
-%   for j = 1:size(rank_kappa, 2)-1
-%     s = [s, num2str(rank_kappa(i, j)), ' & '];
-%   end
-%   disp([s, num2str(rank_kappa(i, end)), ' \\ '])
-% end
 
 for i = 1:size(rank_kappa, 1)
   s = [dats2{i} ' & '];
