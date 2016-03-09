@@ -8,7 +8,7 @@ dats2 = {'poker', 'noaa', 'elec2', 'spam', 'sea', 'air'};
 errs = [];
 kapp = [];
 timers = [];
-type2 = 'end5';
+type2 = 'end';
 FS = 24;
 
 for qq = 1:length(dats2)
