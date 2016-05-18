@@ -3,6 +3,8 @@ clc
 clear
 close all 
 
+addpath('utils/');
+
 tail = 'left';
 alpha = .05;
 dats2 = {'poker', 'noaa', 'elec2', 'spam', 'sea', 'air'};
@@ -76,7 +78,7 @@ rank_kappa(end + 1, :) = mean(rank_kappa);
 dats2{end+1} = '';
 
 [hZtest_err, pZtest_err, pFtest_err] = friedman_demsar(errs, tail, alpha);
-[hZtest_kapp, pZtest_kapp, pFtest_kapp] = friedman_demsar(1 - kapp, tail, alpha);
+[hZtest_kapp, pZtest_kapp, pFtest_kapp] = friedman_demsar(100 - kapp, tail, alpha);
 
 disp(' ')
 disp('Error Table')
@@ -193,12 +195,6 @@ end
 
 
 
-alg = 'SML & CVX & AVG & NSE & FTL';
-
-disp(' ')
-disp('Error Table')
-disp(alg)
-
 
 alg = 'SML & CVX & AVG & NSE & FTL';
 
@@ -212,10 +208,8 @@ rank_kappa(end + 1, :) = mean(rank_kappa);
 dats2{end+1} = '';
 
 [hZtest_err, pZtest_err, pFtest_err] = friedman_demsar(errs, tail, alpha);
-[hZtest_kapp, pZtest_kapp, pFtest_kapp] = friedman_demsar(1 - kapp, tail, alpha);
+[hZtest_kapp, pZtest_kapp, pFtest_kapp] = friedman_demsar(100 - kapp, tail, alpha);
 [hZtest_time, pZtest_time, pFtest_time] = friedman_demsar(timers, tail, alpha);
-
-
 
 errs = round(errs*1000)/10;
 kapp = round(kapp*1000)/10;
