@@ -4,7 +4,7 @@ clear
 close all 
 
 tail = 'left';
-alpha = .05;
+alpha2 = .05;
 dats2 = {'poker', 'noaa', 'elec2', 'spam', 'sea', 'air'};
 % dats = {'elec2'};
 errs = [];
@@ -13,8 +13,8 @@ kapp = [];
 
 for qq = 1:length(dats2)
   dat = dats2{qq};
-%   load(['../results/', dat, '_END_err_kappa.mat']);
-  load(['../results/', dat, '_err_kappa.mat']);
+  load(['../results/', dat, '_END_err_kappa.mat']);
+%   load(['../results/', dat, '_err_kappa.mat']);
   
   range = 2:size(err_avg,1)-2;
   
@@ -75,8 +75,8 @@ rank_kappa = rank_rows(1 - kapp);
 rank_kappa(end + 1, :) = mean(rank_kappa);
 dats2{end+1} = '';
 
-[hZtest_err, pZtest_err, pFtest_err] = friedman_demsar(errs, tail, alpha);
-[hZtest_kapp, pZtest_kapp, pFtest_kapp] = friedman_demsar(1 - kapp, tail, alpha);
+[hZtest_err, pZtest_err, pFtest_err] = friedman_demsar(errs, tail, alpha2);
+[hZtest_kapp, pZtest_kapp, pFtest_kapp] = friedman_demsar(100 - kapp, tail, alpha2);
 
 disp(' ')
 disp('Error Table')
@@ -210,12 +210,12 @@ alg = 'SML & CVX & AVG & NSE & FTL';
 
 rank_errs = rank_rows(errs);
 rank_errs(end + 1, :) = mean(rank_errs);
-rank_kappa = rank_rows(1 - kapp);
+rank_kappa = rank_rows(100-kapp);
 rank_kappa(end + 1, :) = mean(rank_kappa);
 dats2{end+1} = '';
 
 [hZtest_err, pZtest_err, pFtest_err] = friedman_demsar(errs, tail, alpha);
-[hZtest_kapp, pZtest_kapp, pFtest_kapp] = friedman_demsar(1 - kapp, tail, alpha);
+[hZtest_kapp, pZtest_kapp, pFtest_kapp] = friedman_demsar(100 - kapp, tail, alpha);
 
 disp(' ')
 disp('Error Table')
