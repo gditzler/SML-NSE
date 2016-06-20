@@ -1,3 +1,4 @@
+%% run the experiment 
 clc; 
 clear; 
 close all;
@@ -6,10 +7,6 @@ close all;
 addpath('algorithms/');
 addpath('utils/');
 addpath('data/');
-
-%     'connect-4.csv'
-%     'ozone.csv'
-
 
 avg = 10; 
 datasets = {
@@ -200,3 +197,139 @@ for dd = 1:length(datasets)
 end
 
 delete(gcp('nocreate'));
+%% plot the results 
+clc;
+clear; 
+close all;
+
+files = dir('../results/*alpha*');
+all_err = zeros(length(files)-7, 11);
+all_kap = zeros(length(files)-7, 11);
+
+nn = 1;
+for f = files'
+  if ~isempty(strfind(f.name, 'ozone'))
+    continue; 
+  end
+  if ~isempty(strfind(f.name, 'hill-valley'))
+    continue; 
+  end
+  if ~isempty(strfind(f.name, 'cylinder-bands'))
+    continue; 
+  end
+  if ~isempty(strfind(f.name, 'connect-4'))
+    continue; 
+  end
+  if ~isempty(strfind(f.name, 'breast-cancer-wisc-prog'))
+    continue; 
+  end
+  if ~isempty(strfind(f.name, 'breast-cancer'))
+    continue; 
+  end
+  if ~isempty(strfind(f.name, 'statlog-australian-credit'))
+    continue; 
+  end
+  
+  load(['../results/', f.name]);
+  close all;
+
+  err_cvx00 = mean(err_cvx00, 2);
+  err_cvx10 = mean(err_cvx10, 2);
+  err_cvx20 = mean(err_cvx20, 2);
+  err_cvx30 = mean(err_cvx30, 2);
+  err_cvx40 = mean(err_cvx40, 2);
+  err_cvx50 = mean(err_cvx50, 2);
+  err_cvx60 = mean(err_cvx60, 2);
+  err_cvx70 = mean(err_cvx70, 2);
+  err_cvx80 = mean(err_cvx80, 2);
+  err_cvx90 = mean(err_cvx90, 2);
+  err_cvx100 = mean(err_cvx100, 2);
+  
+  kappa_cvx00 = nanmean(kappa_cvx00, 2);
+  kappa_cvx10 = nanmean(kappa_cvx10, 2);
+  kappa_cvx20 = nanmean(kappa_cvx20, 2);
+  kappa_cvx30 = nanmean(kappa_cvx30, 2);
+  kappa_cvx40 = nanmean(kappa_cvx40, 2);
+  kappa_cvx50 = nanmean(kappa_cvx50, 2);
+  kappa_cvx60 = nanmean(kappa_cvx60, 2);
+  kappa_cvx70 = nanmean(kappa_cvx70, 2);
+  kappa_cvx80 = nanmean(kappa_cvx80, 2);
+  kappa_cvx90 = nanmean(kappa_cvx90, 2);
+  kappa_cvx100 = nanmean(kappa_cvx100, 2);
+  
+  timez = 1:numel(err_cvx00);
+  lw = 2;
+  
+  all_err(nn, :) = [mean(err_cvx00), mean(err_cvx10), mean(err_cvx20), mean(err_cvx30), ...
+    mean(err_cvx40), mean(err_cvx50), mean(err_cvx60), mean(err_cvx70), mean(err_cvx80), ...
+    mean(err_cvx90), mean(err_cvx100)];
+  all_kap(nn, :) = [mean(kappa_cvx00), mean(kappa_cvx10), mean(kappa_cvx20), mean(kappa_cvx30), ...
+    mean(kappa_cvx40), mean(kappa_cvx50), mean(kappa_cvx60), mean(kappa_cvx70), mean(kappa_cvx80), ...
+    mean(kappa_cvx90), mean(kappa_cvx100)];
+  nn = nn+1;
+
+
+  hh=figure; 
+  hold on;
+  box on;
+%   plot(timez, smooth(err_cvx00), 'color', [0,0,0], 'LineWidth', lw)
+%   % plot(timez, smooth(err_cvx10), 'color', [0,0,0]+.1, 'LineWidth', lw)
+%   plot(timez, smooth(err_cvx20), 'color', [0,0,0]+.2, 'LineWidth', lw)
+%   % plot(timez, smooth(err_cvx30), 'color', [0,0,0]+.3, 'LineWidth', lw)
+%   plot(timez, smooth(err_cvx40), 'color', [0,0,0]+.4, 'LineWidth', lw)
+%   % plot(timez, smooth(err_cvx50), 'color', [0,0,0]+.5, 'LineWidth', lw)
+%   plot(timez, smooth(err_cvx60), 'color', [0,0,0]+.6, 'LineWidth', lw)
+%   % plot(timez, smooth(err_cvx70), 'color', [0,0,0]+.7, 'LineWidth', lw)
+%   plot(timez, smooth(err_cvx80), 'color', [0,0,0]+.8, 'LineWidth', lw)
+%   % plot(timez, smooth(err_cvx90), 'color', [0,0,0]+.9, 'LineWidth', lw)
+%   plot(timez, smooth(err_cvx100), 'color', [0,0,0]+.9, 'LineWidth', lw)
+  
+  plot(timez, err_cvx00, 'color', [0,0,0]+0, 'LineWidth', lw)
+  % plot(timez, err_cvx10, 'color', [0,0,0]+.1, 'LineWidth', lw)
+  plot(timez, err_cvx20, 'color', [0,0,0]+.2, 'LineWidth', lw)
+  % plot(timez, err_cvx30, 'color', [0,0,0]+.3, 'LineWidth', lw)
+  plot(timez, err_cvx40, 'color', [0,0,0]+.4, 'LineWidth', lw)
+  % plot(timez, err_cvx50, 'color', [0,0,0]+.5, 'LineWidth', lw)
+  plot(timez, err_cvx60, 'color', [0,0,0]+.6, 'LineWidth', lw)
+  % plot(timez, err_cvx70, 'color', [0,0,0]+.7, 'LineWidth', lw)
+  plot(timez, err_cvx80, 'color', [0,0,0]+.8, 'LineWidth', lw)
+  % plot(timez, err_cvx90, 'color', [0,0,0]+.9, 'LineWidth', lw)
+  plot(timez, err_cvx100, 'color', [0,0,0]+.9, 'LineWidth', lw)
+  axis tight;
+  set(gca, 'fontsize', 22)
+  xlabel('Time Stamp', 'FontSize', 22)
+  ylabel('Kappa', 'FontSize', 22)
+%   saveas(hh, ['../results/', f.name, '.fig'])
+end
+
+
+%% 
+close all
+Re = rank_rows(all_err);
+Rem = mean(Re);
+X = 0:0.1:1;
+L = {};
+for i = 1:numel(X)
+  L{i} = num2str(X(i));
+end
+hh=figure;
+% box on;
+% stem(X, Rem, 'LineWidth', 3, 'MarkerSize', 10)
+boxplot(Re, 'Notch', 'on', 'Labels', L, 'BoxStyle', 'outline', 'MedianStyle', 'target')
+set(gca, 'fontsize', 20)
+saveas(hh, '../results/box_error.fig');
+saveas(hh, '../results/box_error.eps', 'eps2c');
+
+% all_kap(isnan(all_kap)) = -1;
+Rk = rank_rows(all_kap);
+Rkm = mean(Rk);
+X = 0:0.1:1;
+hh=figure;
+% box on;
+% stem(X, Rkm, 'LineWidth', 3, 'MarkerSize', 10)
+% set(gca, 'fontsize', 22)
+boxplot(Rk, 'Notch', 'on', 'Labels', L, 'BoxStyle', 'outline', 'MedianStyle', 'target')
+set(gca, 'fontsize', 20)
+saveas(hh, '../results/box_kappa.fig');
+saveas(hh, '../results/box_kappa.eps', 'eps2c');
+
