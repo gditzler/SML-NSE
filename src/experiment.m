@@ -34,8 +34,7 @@ kappa_avg = zeros(length(data_train), avg);
 
 for i = 1:avg
   disp(i)
-  [data_train, data_test, labels_train, labels_test] = test_then_train(alldata, ...
-    allclass, win_size, sample);
+  [data_train, data_test, labels_train, labels_test] = test_then_train(alldata, allclass, win_size, sample);
   [err_sml(:,i), err_mle(:,i), err_map(:,i), err_avg_cor(:,i), err_avg(:,i), ~, kappa_sml(:,i), kappa_mle(:,i), kappa_map(:,i), kappa_avg_cor(:,i), kappa_avg(:,i), ~] = incremental_learner(data_train, data_test, labels_train, labels_test, clfr, max_learners);
 end
 
