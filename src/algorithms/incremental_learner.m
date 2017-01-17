@@ -38,10 +38,12 @@ for t = 1:T-1
   preds_te = predictions(ensemble, data_te{t});
   preds_te(preds_te == 2) = -1;
   
-  if t > 1  
+  if size(preds_te, 2) > 1  
     switch model_type
       case 'sml'
         yhat = vote_sml(preds_te);
+      case 'sml2'
+        yhat = vote_sml_2(preds_te);
       case 'mle'
         yhat = vote_mle(preds_te);
       case 'map'

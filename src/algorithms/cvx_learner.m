@@ -66,7 +66,8 @@ for t = 1:T-1
     err_ewma(tt) = sum(preds_val(:,tt)~=yval)/numel(yval)+delta;
     err_ewma(err_ewma > 0.5) = 0.5;
     
-    [~, psi, eta] = vote_mle(preds_te);
+    %[~, psi, eta] = vote_mle(preds_te);
+    [~, psi, eta] = vote_sml_2(preds_te);
     V = 1 - (psi + eta)/2;
     V(V > 0.5) = 0.5;
     w_sml = log((1 - V)./V);
@@ -83,7 +84,11 @@ for t = 1:T-1
     dd=1;
   end
   errors(t) = calc_error(yhat, labels_te{t});
+  try
   kappas(t) = kappa(confusionmat(labels_te{t}, yhat));
+  catch
+    dd=1;
+  end
   timers(t) = toc;
 end
 
