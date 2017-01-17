@@ -1,21 +1,32 @@
+% This script compares FTL, SML, CVX-SML, and L++.NSE of a lage collection 
+% of binary prediction problems that come from nonstationary data streams. Unlike
+% other experiments, this script will make sure that the training and testing 
+% data are always available. 
 clc; 
 clear; 
 close all;
 
-
+% add the paths for the algorithms we are going to compare against 
 addpath('algorithms/');
 addpath('utils/');
 addpath('data/');
 
-avg = 10; 
-% dats = { 'rbf-01.arff', 'rbf-001.arff', 'rbf-0001.arff'};
-dats = {'air', 'noaa', 'poker', 'elec2', 'spam', 'sea'};
-alpha = .7;
-beta = .5;
-parpool(avg);
+% free parameters of the experiement
+avg = 10;             % number of averages to perform  
+alpha = .7;           % exponential forgetting factor for CVX-sense
+beta = .5;            % convex combination parameter for CVX-sense
+end_experiment = 0;   % test-then-train or test-on-last
+% parpool(4);
 
-end_experiment = 0;
-
+% data must be downloaded from the UAMLDA Gitlab data set repo 
+dats = {
+  'noaa'
+  'poker'
+  'elec2'
+  'spam'
+  'sea'
+  'air'
+  };
 
 for dd = 1:length(dats)
   dat = dats{dd};
@@ -28,15 +39,13 @@ for dd = 1:length(dats)
     allclass = allclass'; % ^^^^^
     win_size = 120;    % size of train / test batch (3 months - 1 season)
     mclass = 2;
-    
   elseif strcmp(dat,'air')
     alldata = load('data/air2.arff');
     mclass = 2;
     allclass = alldata(:, 8);
     allclass = allclass + 1;
     alldata(:, 8) = [];
-    win_size = 1200;   
-  
+    win_size = 1200;     
   elseif strcmp(dat,'poker')
     alldata = load('data/poker.arff');
     alldata(alldata(:, end) == 9, :) = [];
@@ -55,8 +64,6 @@ for dd = 1:length(dats)
     % figure; hold on
     % plot(find(allclass==1), cumsum(allclass(allclass==1)))
     % plot(find(allclass==2), cumsum(allclass(allclass==2)==2))
-
-    
   elseif strcmp(dat,'rbf')
     alldata = load('data/rbf150k.arff');
     mclass = 2;
@@ -64,7 +71,6 @@ for dd = 1:length(dats)
     allclass = allclass + 1;
     alldata(:, end) = [];
     win_size = 1200; 
-    
   elseif strcmp(dat,'elec2')
     load elec2;
     alldata(3,:) = []; % remove the "cheating" features
@@ -73,32 +79,26 @@ for dd = 1:length(dats)
     alldata = alldata';   % old format of data needs transpose
     allclass = allclass'; % ^^^^^
     mclass = 2;
-    
   elseif strcmp(dat,'dataLU')
     load dataLU
     alldata = dataLU.X';
     allclass = dataLU.y' + 1;
     win_size = 100;
     mclass = max(allclass);
-    
   elseif strcmp(dat,'chess')
     load chessIZ
     alldata = alldata';   % old format of data needs transpose
     allclass = allclass'; % ^^^^^
-
     alldata(allclass==3, :) = [];
     allclass(allclass==3) = [];
-
     mclass = max(allclass);
     win_size = 35;
-    
   elseif strcmp(dat,'spam')
     load spam2
     alldata = alldata';   % old format of data needs transpose
     allclass = allclass'; % ^^^^^
     mclass = max(allclass);
     win_size = 100;
-    
   elseif strcmp(dat, 'sea')
     win_size = 250;
     len = 200;
@@ -119,7 +119,6 @@ for dd = 1:length(dats)
     allclass = [s1;s2;s3;s4];
     mclass = 2;
     win_size = win_size-1;
-    
   else
     data = load(dat);
     allclass = data(:, end)+1;
@@ -127,13 +126,17 @@ for dd = 1:length(dats)
     win_size = numel(allclass)/2000;
     mclass = length(unique(allclass));
     clear data
-    
   end
 
+  % several of the models need to know the number of time stamps in
+  % advance, so partition the data into a stream to determine the number of
+  % batches in the data stream
   if end_experiment == 1
-    [data_train, data_test, labels_train, labels_test] = test_on_last(alldata, allclass, win_size, true);
+    [data_train, data_test, labels_train, labels_test] = test_on_last(...
+      alldata, allclass, win_size, true);
   else
-    [data_train, data_test, labels_train, labels_test] = test_then_train(alldata, allclass, win_size, true);
+    [data_train, data_test, labels_train, labels_test] = test_then_train(...
+      alldata, allclass, win_size, true);
   end
   
   
@@ -148,6 +151,7 @@ for dd = 1:length(dats)
   netNSE.mclass = mclass;          % number of classes in the prediciton problem
   netNSE.base_classifier = model;  % set the base classifier in the net struct
 
+  % set up variables to save the error, kappa, and evaluation times
   err_sml = zeros(length(data_train), avg); 
   err_mle = zeros(length(data_train), avg); 
   err_map = zeros(length(data_train), avg); 
@@ -177,112 +181,58 @@ for dd = 1:length(dats)
   time_nse = zeros(length(data_train), avg);
   time_cvx = zeros(length(data_train), avg);
   time_scar = zeros(length(data_train), avg);
-  
-  
-  err_sml25 = zeros(length(data_train), avg); 
-  err_mle25 = zeros(length(data_train), avg); 
-  err_map25 = zeros(length(data_train), avg); 
-  err_avg_cor25 = zeros(length(data_train), avg); 
-  err_avg25 = zeros(length(data_train), avg); 
-  err_ftl25 = zeros(length(data_train), avg); 
-  err_nse25 = zeros(length(data_train), avg);
-  err_cvx25 = zeros(length(data_train), avg);
-
-  kappa_sml25 = zeros(length(data_train), avg); 
-  kappa_mle25 = zeros(length(data_train), avg); 
-  kappa_map25 = zeros(length(data_train), avg); 
-  kappa_avg_cor25 = zeros(length(data_train), avg); 
-  kappa_avg25 = zeros(length(data_train), avg); 
-  kappa_ftl25 = zeros(length(data_train), avg); 
-  kappa_nse25 = zeros(length(data_train), avg);
-  kappa_cvx25 = zeros(length(data_train), avg);
-  
-  time_sml25 = zeros(length(data_train), avg); 
-  time_mle25 = zeros(length(data_train), avg); 
-  time_map25 = zeros(length(data_train), avg); 
-  time_avg_cor25 = zeros(length(data_train), avg); 
-  time_avg25 = zeros(length(data_train), avg); 
-  time_ftl25 = zeros(length(data_train), avg); 
-  time_nse25 = zeros(length(data_train), avg);
-  time_cvx25 = zeros(length(data_train), avg);
 
   parfor i = 1:avg
     disp(['  -Avg ', num2str(i), '/', num2str(avg)]);
 
+    % split up the data into a training and testing data stream
     if end_experiment == 1
-      [data_train, data_test, labels_train, labels_test] = test_on_last(alldata, allclass, win_size, true);
+      [data_train, data_test, labels_train, labels_test] = test_on_last(...
+        alldata, allclass, win_size, true);
     else
-      [data_train, data_test, labels_train, labels_test] = test_then_train(alldata, allclass, win_size, true);
+      [data_train, data_test, labels_train, labels_test] = test_then_train(...
+        alldata, allclass, win_size, true);
     end
 
-    disp('     >FTL')
-    [err_ftl(:,i), kappa_ftl(:,i), time_ftl(:,i)] = follow_the_leader(netFTL, data_train, ...
-      labels_train, data_test, labels_test);
-
-    disp('     >NSE')
-    [err_nse(:,i), kappa_nse(:,i), time_nse(:, i)] = learn_nse(netNSE, data_train, labels_train, ...
-      data_test, labels_test);
-
-    disp('     >SML')
-    [err_sml(:,i), kappa_sml(:,i), time_sml(:,i)] = incremental_learner(data_train, ...
-      data_test, labels_train, labels_test, model, max_learners, 'sml');
-    
-    disp('     >MLE')
-    [err_mle(:,i), kappa_mle(:,i), time_mle(:,i)] = incremental_learner(data_train, ...
-      data_test, labels_train, labels_test, model, max_learners, 'mle');
-    
-    disp('     >MAP')
-    [err_map(:,i), kappa_map(:,i), time_map(:,i)] = incremental_learner(data_train, ...
-      data_test, labels_train, labels_test, model, max_learners, 'map');
-     
-    disp('     >AVG1')
-    [err_avg(:,i), kappa_avg(:,i), time_avg(:,i)] = incremental_learner(data_train, ...
-      data_test, labels_train, labels_test, model, max_learners, 'avg1');
-    
-    disp('     >AVG2')
-    [err_avg_cor(:,i), kappa_avg_cor(:,i), time_avg_cor(:,i)] = incremental_learner(data_train, ...
-      data_test, labels_train, labels_test, model, max_learners, 'avg2');
-    
-    disp('     >CVX')
+    % follow the leader
+    [err_ftl(:,i), kappa_ftl(:,i), time_ftl(:,i)] = follow_the_leader(netFTL, ...
+      data_train, labels_train, data_test, labels_test, 0);
+    % learn++.nse
+    [err_nse(:,i), kappa_nse(:,i), time_nse(:, i)] = learn_nse(netNSE, ...
+      data_train, labels_train, data_test, labels_test);
+    % sml
+    [err_sml(:,i), kappa_sml(:,i), time_sml(:,i)] = incremental_learner(...
+      data_train, data_test, labels_train, labels_test, model, max_learners, ...
+      'sml2', 0);
+    % sml with mle
+    %[err_mle(:,i), kappa_mle(:,i), time_mle(:,i)] = incremental_learner(...
+    %  data_train, data_test, labels_train, labels_test, model, max_learners, ...
+    %  'mle');
+    % sml with map
+    %[err_map(:,i), kappa_map(:,i), time_map(:,i)] = incremental_learner(...
+    %  data_train, data_test, labels_train, labels_test, model, max_learners, ...
+    %  'map');
+    % simple averging
+    [err_avg(:,i), kappa_avg(:,i), time_avg(:,i)] = incremental_learner(...
+      data_train, data_test, labels_train, labels_test, model, max_learners, ...
+      'avg1', 0);
+    % corrected averaging
+    [err_avg_cor(:,i), kappa_avg_cor(:,i), time_avg_cor(:,i)] = ...
+      incremental_learner(data_train, data_test, labels_train, labels_test, ...
+      model, max_learners, 'avg2', 0);
+    % cvx-sense
     [err_cvx(:,i), kappa_cvx(:,i), time_cvx(:,i)] = cvx_learner(data_train, ...
-      data_test, labels_train, labels_test, model, max_learners, alpha, beta);
-    
-    disp('     >SCAR')
+      data_test, labels_train, labels_test, model, max_learners, alpha, beta, 0);
     % scargc
     X = [data_train{1}, labels_train{1}; cell2mat(data_train'), cell2mat(labels_train')];
-    [~, ~, ~, err_scar(:,i), kappa_scar(:,i), time_scar(:,i)] = SCARGC_1NN(X, win_size, win_size, length(unique(allclass2)));
-    
-%     disp('     >SML')
-%     [err_sml25(:,i), kappa_sml25(:,i), time_sml25(:,i)] = incremental_learner(data_train, ...
-%       data_test, labels_train, labels_test, model, 25, 'sml');
-%     
-%     disp('     >MLE')
-%     [err_mle25(:,i), kappa_mle25(:,i), time_mle25(:,i)] = incremental_learner(data_train, ...
-%       data_test, labels_train, labels_test, model, 25, 'mle');
-%     
-%     disp('     >MAP')
-%     [err_map25(:,i), kappa_map25(:,i), time_map25(:,i)] = incremental_learner(data_train, ...
-%       data_test, labels_train, labels_test, model, 25, 'map');
-%      
-%     disp('     >AVG1')
-%     [err_avg25(:,i), kappa_avg25(:,i), time_avg25(:,i)] = incremental_learner(data_train, ...
-%       data_test, labels_train, labels_test, model, 25, 'avg1');
-%     
-%     disp('     >AVG2')
-%     [err_avg_cor25(:,i), kappa_avg_cor25(:,i), time_avg_cor25(:,i)] = incremental_learner(data_train, ...
-%       data_test, labels_train, labels_test, model, 25, 'avg2');
-%     
-%     disp('     >CVX')
-%     [err_cvx25(:,i), kappa_cvx25(:,i), time_cvx25(:,i)] = cvx_learner(data_train, ...
-%       data_test, labels_train, labels_test, model, 25, alpha, beta);
-    
-    
+    [~, ~, ~, err_scar(:,i), kappa_scar(:,i), time_scar(:,i)] = SCARGC_1NN(X, ...
+      win_size, win_size, length(unique(allclass2)));    
   end
   
   if end_experiment == 1
-    save(['../results/', dat, '_END_err_kappa.mat']);
+    save(['../results/nse_', dat, '_END_err_kappa.mat']);
   else
-    save(['../results/', dat, '_err_kappa.mat']);
+    save(['../results/nse_', dat, '_err_kappa.mat']);
   end
 
 end

@@ -17,6 +17,7 @@ end_experiment = 0;   % test-then-train or test-on-last
 avg = 10;             % number of averages to perform  
 alpha = .7;           % exponential forgetting factor for CVX-sense
 beta = .5;            % convex combination parameter for CVX-sense
+mclass = 2;
 
 % data must be downloaded from the UAMLDA Gitlab data set repo 
 datasets = {
@@ -199,14 +200,14 @@ for dd = 1:length(datasets)
 
     % follow the leader
     [err_ftl(:,i), kappa_ftl(:,i), time_ftl(:,i)] = follow_the_leader(netFTL, ...
-      data_train, labels_train, data_test, labels_test);
+      data_train, labels_train, data_test, labels_test, 0);
     % learn++.nse
     [err_nse(:,i), kappa_nse(:,i), time_nse(:, i)] = learn_nse(netNSE, ...
       data_train, labels_train, data_test, labels_test);
     % sml
     [err_sml(:,i), kappa_sml(:,i), time_sml(:,i)] = incremental_learner(...
       data_train, data_test, labels_train, labels_test, model, max_learners, ...
-      'sml2');
+      'sml2', 0);
     % sml with mle
     %[err_mle(:,i), kappa_mle(:,i), time_mle(:,i)] = incremental_learner(...
     %  data_train, data_test, labels_train, labels_test, model, max_learners, ...
@@ -218,14 +219,14 @@ for dd = 1:length(datasets)
     % simple averging
     [err_avg(:,i), kappa_avg(:,i), time_avg(:,i)] = incremental_learner(...
       data_train, data_test, labels_train, labels_test, model, max_learners, ...
-      'avg1');
+      'avg1', 0);
     % corrected averaging
     [err_avg_cor(:,i), kappa_avg_cor(:,i), time_avg_cor(:,i)] = ...
       incremental_learner(data_train, data_test, labels_train, labels_test, ...
-      model, max_learners, 'avg2');
+      model, max_learners, 'avg2', 0);
     % cvx-sense
     [err_cvx(:,i), kappa_cvx(:,i), time_cvx(:,i)] = cvx_learner(data_train, ...
-      data_test, labels_train, labels_test, model, max_learners, alpha, beta);
+      data_test, labels_train, labels_test, model, max_learners, alpha, beta, 0);
     % scargc
     X = [data_train{1}, labels_train{1}; cell2mat(data_train'), cell2mat(labels_train')];
     [~, ~, ~, err_scar(:,i), kappa_scar(:,i), time_scar(:,i)] = SCARGC_1NN(X, ...
