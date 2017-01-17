@@ -13,6 +13,7 @@ function [MLE, psi, eta] = vote_mle(X)
 
   %log weighted
   [R_wgs, ~] = covadj_weighted(CMAT, VMAT);
+  %[R_wgs, ~] = eigs(CMAT, 1);
   rho_wgs = nanmean(R_wgs);
   if rho_wgs<0, 
     R_wgs = -R_wgs; 
@@ -82,8 +83,9 @@ function [R, D, CMAT2] = covadj_weighted(CMAT, VMAT)
     b(i) = lscov(x(:,i), y, f);
   catch
     b(i) = abs(randn);
-    disp('Error in LSCOV');
+    %disp('Error in LSCOV');
   end
+  % it is not adjusted
   CMAT2 = CMAT;
 
   for i = 1:M
@@ -91,7 +93,7 @@ function [R, D, CMAT2] = covadj_weighted(CMAT, VMAT)
   end
 
   [R, D] = eigs(CMAT2, 1);
-
+%   [R, D] = eigs(CMAT, 1);
 end
 
 

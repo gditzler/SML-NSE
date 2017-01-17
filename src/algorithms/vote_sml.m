@@ -14,6 +14,7 @@ function HL = vote_sml(X)
 
   %log weighted
   [R_wgs, ~] = covadj_weighted(CMAT, VMAT);
+  %[R_wgs, ~] = eigs(CMAT, 1);
   rho_wgs = nanmean(R_wgs);
   if rho_wgs<0, 
     R_wgs = -R_wgs; 

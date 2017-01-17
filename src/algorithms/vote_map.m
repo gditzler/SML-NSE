@@ -1,4 +1,4 @@
-function [HL, V1, MLE, MAP, VO, time_sml, time_mle, time_map] = spectral_meta_learner(X)
+function [HL, V1, MLE, MAP, VO, time_sml, time_mle, time_map] = vote_map(X)
 
   X = sign(X);
   p0 = sum(X(:) == 1)./sum(X(:) ~= 0);
@@ -13,7 +13,8 @@ function [HL, V1, MLE, MAP, VO, time_sml, time_mle, time_map] = spectral_meta_le
   VO = VOTING(X);
 
   %log weighted
-  [R_wgs,~] = covadj_weighted(CMAT, VMAT);
+  [R_wgs, ~] = covadj_weighted(CMAT, VMAT);
+  %[R_wgs, ~] = eigs(CMAT, 1);
   rho_wgs = nanmean(R_wgs);
   if rho_wgs<0, 
     R_wgs = -R_wgs; 
