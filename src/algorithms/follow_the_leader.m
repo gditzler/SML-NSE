@@ -75,6 +75,18 @@ for ell = 1:n_timestamps
   if missing == 0
     net.classifiers{index} = classifier_train(net.base_classifier, ...
       data_train_t, labels_train_t);
+    
+    if ell < net.n_classifiers
+      T = ell;
+    else
+      T =  net.n_classifiers;
+    end
+    y = decision_ensemble(net, data_train_t, labels_train_t, T);
+    e = zeros(T,1);
+    for t = 1:T
+      [~,~,~,~, e(t)] = stats(labels_train_t, y(:,t), net.mclass);
+    end
+    [~, i] = min(e);
   else
     if ~isempty(data_train_t)
       tt = 0;
@@ -115,7 +127,7 @@ for ell = 1:n_timestamps
 %   for t = 1:T
 %     [~,~,~,~, e(t)] = stats(labels_train_t, y(:,t), net.mclass);
 %   end
-%   [~, i] = min(e);
+  [~, i] = min(e);
   h = classifier_test(net.classifiers{i}, data_test_t);
   %[f_measure(ell,:),g_mean(ell),recall(ell,:),precision(ell,:),...
   %  err(ell)] = stats(labels_test_t, h, net.mclass);
