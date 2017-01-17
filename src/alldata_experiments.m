@@ -48,7 +48,7 @@ datasets = {
 % dats = {  'air'};
 alpha = .7;
 beta = .5;
-parpool(avg);
+% parpool(avg);
 mclass = 2;
 
 end_experiment = 0;
