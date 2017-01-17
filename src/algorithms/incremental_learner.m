@@ -1,6 +1,8 @@
-function [errors, kappas, timers] = incremental_learner(data_tr, data_te, labels_tr, labels_te, clfr, max_learners, model_type)
+function [errors, kappas, timers] = incremental_learner(data_tr, data_te, labels_tr, labels_te, clfr, max_learners, model_type, missing)
 %
-
+if nargin == 7 
+  missing = 0;
+end
 if (~(iscell(data_tr) && iscell(data_te) ...
     && iscell(labels_te) && iscell(labels_tr)))
   error('data and labels must be cell arrays.')
@@ -24,13 +26,19 @@ ensemble = {};
 for t = 1:T-1
   tic;     
   
-  tt = mod(t-1, max_learners)+1; % location of current learner
-  ensemble{tt} = classifier_train(clfr, data_tr{t}, labels_tr{t});
+  if missing == 0
+    tt = mod(t-1, max_learners)+1; % location of current learner
+    ensemble{tt} = classifier_train(clfr, data_tr{t}, labels_tr{t});
+  else
+    if ~isempty(data_tr{t})
+      tt = length(ensemble);
+      ensemble{tt+1} = classifier_train(clfr, data_tr{t}, labels_tr{t});
+    end
+  end
   preds_te = predictions(ensemble, data_te{t});
   preds_te(preds_te == 2) = -1;
-
-  if t > 1
-    
+  
+  if t > 1  
     switch model_type
       case 'sml'
         yhat = vote_sml(preds_te);

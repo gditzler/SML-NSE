@@ -1,5 +1,8 @@
-function [errors, kappas, timers] = cvx_learner(data_tr, data_te, labels_tr, labels_te, clfr, max_learners, alpha, beta)
+function [errors, kappas, timers] = cvx_learner(data_tr, data_te, labels_tr, labels_te, clfr, max_learners, alpha, beta, missing)
 %
+if nargin == 8 
+  missing = 0;
+end
 p = 3;
 delta = 0.0001;
 
@@ -31,15 +34,27 @@ for t = 1:T-1
   nv = ceil(.8*length(yt));
   i = randperm(length(yt));
   
+  if missing == 0
+    tt = mod(t-1, max_learners)+1; % location of current learner
+    ensemble{tt} = classifier_train(clfr, data_tr{t}, labels_tr{t});
+    preds_val = predictions(ensemble, Xt(i(nv+1:end), :));
+    yval = yt(i(nv+1:end));
+  else
+    if ~isempty(data_tr{t})
+      tt = length(ensemble);
+      ensemble{tt+1} = classifier_train(clfr, data_tr{t}, labels_tr{t});
+      preds_val = predictions(ensemble, Xt(i(nv+1:end), :));
+      yval = yt(i(nv+1:end));
+      tt=tt+1;
+    end
+  end
   
-  
-  tt = mod(t-1, max_learners)+1; % location of current learner
-  ensemble{tt} = classifier_train(clfr, Xt(i(1:nv), :), yt(i(1:nv)));
+  %tt = mod(t-1, max_learners)+1; % location of current learner
+  %ensemble{tt} = classifier_train(clfr, Xt(i(1:nv), :), yt(i(1:nv)));
   preds_te = predictions(ensemble, data_te{t});
   preds_te(preds_te == 2) = -1;
   
-  preds_val = predictions(ensemble, Xt(i(nv+1:end), :));
-  yval = yt(i(nv+1:end));
+  
   
   if t == 1 
     err_ewma(1) = sum(preds_val~=yval)/numel(yval);

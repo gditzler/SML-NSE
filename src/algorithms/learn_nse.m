@@ -117,6 +117,7 @@ for ell = 1:n_timestamps
   mt = size(data_train_t,1); % numnber of training examples
   Dt = ones(mt,1)/mt;         % initialize instance weight distribution
   
+  if mt ~=0
   if net.initialized==1,
     % STEP 1: Compute error of the existing ensemble on new data
     predictions = classify_ensemble(net, data_train_t, labels_train_t);
@@ -182,7 +183,8 @@ for ell = 1:n_timestamps
   
   % STEP 7: classifier voting weights
   net.classifierweigths{end+1} = net.w(end,:);
-  
+  net.t = net.t + 1;
+  end
   [predictions,posterior] = classify_ensemble(net, data_test_t, labels_test_t);
   timers(ell) = toc - (tr_time);
   %errs(ell) = sum(predictions ~= labels_test_t)/numel(labels_test_t);
@@ -194,7 +196,7 @@ for ell = 1:n_timestamps
   kap(ell) = kappa(confusionmat(labels_test_t, predictions));
   
   net.initialized = 1;
-  net.t = net.t + 1;
+  
   
 
 end

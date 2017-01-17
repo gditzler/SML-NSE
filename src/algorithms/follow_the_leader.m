@@ -1,4 +1,4 @@
-function [err, kap, timers] = follow_the_leader(net, data_train, labels_train, data_test, labels_test)
+function [err, kap, timers] = follow_the_leader(net, data_train, labels_train, data_test, labels_test, missing)
 %    [net,f_measure,g_mean,precision,recall,err] = follow_the_leader(net, ...
 %        data_train, labels_train, ...
 %        data_test, labels_test, ...
@@ -40,7 +40,9 @@ function [err, kap, timers] = follow_the_leader(net, data_train, labels_train, d
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
+if nargin == 5
+  missing = 0;
+end
 
 calc_error = @(x, y) sum(x ~= y)/numel(y);
 
@@ -69,21 +71,51 @@ for ell = 1:n_timestamps
   labels_test_t = labels_test{ell};
   index = mod(ell-1, net.n_classifiers) + 1;
   
-  net.classifiers{index} = classifier_train(...
-    net.base_classifier, ...
-    data_train_t, ...
-    labels_train_t);
-  if ell < net.n_classifiers
-    T = ell;
+  
+  if missing == 0
+    net.classifiers{index} = classifier_train(net.base_classifier, ...
+      data_train_t, labels_train_t);
   else
-    T =  net.n_classifiers;
+    if ~isempty(data_train_t)
+      tt = 0;
+      for q = 1:length(net.classifiers);
+        if ~isempty(net.classifiers{q})
+          tt = tt+1;
+        end
+      end
+      net.classifiers{tt+1} = classifier_train(net.base_classifier, ...
+        data_train_t, labels_train_t);
+
+     % if ell < net.n_classifiers
+     %   T = ell;
+     % else
+     %   T =  net.n_classifiers;
+     %end
+      T = tt+1;
+      y = decision_ensemble(net, data_train_t, labels_train_t, T);
+      e = zeros(T,1);
+      for t = 1:T
+        [~,~,~,~, e(t)] = stats(labels_train_t, y(:,t), net.mclass);
+      end
+      [~, i] = min(e);
+        end
   end
-  y = decision_ensemble(net, data_train_t, labels_train_t, T);
-  e = zeros(T,1);
-  for t = 1:T
-    [~,~,~,~, e(t)] = stats(labels_train_t, y(:,t), net.mclass);
-  end
-  [~, i] = min(e);
+  
+  %net.classifiers{index} = classifier_train(...
+  %  net.base_classifier, ...
+  %  data_train_t, ...
+  %  labels_train_t);
+%   if ell < net.n_classifiers
+%     T = ell;
+%   else
+%     T =  net.n_classifiers;
+%   end
+%   y = decision_ensemble(net, data_train_t, labels_train_t, T);
+%   e = zeros(T,1);
+%   for t = 1:T
+%     [~,~,~,~, e(t)] = stats(labels_train_t, y(:,t), net.mclass);
+%   end
+%   [~, i] = min(e);
   h = classifier_test(net.classifiers{i}, data_test_t);
   %[f_measure(ell,:),g_mean(ell),recall(ell,:),precision(ell,:),...
   %  err(ell)] = stats(labels_test_t, h, net.mclass);
