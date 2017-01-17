@@ -9,7 +9,7 @@ addpath('data/');
 
 avg = 10; 
 % dats = { 'rbf-01.arff', 'rbf-001.arff', 'rbf-0001.arff'};
-dats = {  'air'};
+dats = {'air', 'noaa', 'poker', 'elec2', 'spam', 'sea'};
 alpha = .7;
 beta = .5;
 parpool(avg);
@@ -156,6 +156,7 @@ for dd = 1:length(dats)
   err_ftl = zeros(length(data_train), avg); 
   err_nse = zeros(length(data_train), avg);
   err_cvx = zeros(length(data_train), avg);
+  err_scar = zeros(length(data_train), avg);
 
   kappa_sml = zeros(length(data_train), avg); 
   kappa_mle = zeros(length(data_train), avg); 
@@ -165,6 +166,7 @@ for dd = 1:length(dats)
   kappa_ftl = zeros(length(data_train), avg); 
   kappa_nse = zeros(length(data_train), avg);
   kappa_cvx = zeros(length(data_train), avg);
+  kappa_scar = zeros(length(data_train), avg);
   
   time_sml = zeros(length(data_train), avg); 
   time_mle = zeros(length(data_train), avg); 
@@ -174,6 +176,7 @@ for dd = 1:length(dats)
   time_ftl = zeros(length(data_train), avg); 
   time_nse = zeros(length(data_train), avg);
   time_cvx = zeros(length(data_train), avg);
+  time_scar = zeros(length(data_train), avg);
   
   
   err_sml25 = zeros(length(data_train), avg); 
@@ -244,30 +247,35 @@ for dd = 1:length(dats)
     [err_cvx(:,i), kappa_cvx(:,i), time_cvx(:,i)] = cvx_learner(data_train, ...
       data_test, labels_train, labels_test, model, max_learners, alpha, beta);
     
+    disp('     >SCAR')
+    % scargc
+    X = [data_train{1}, labels_train{1}; cell2mat(data_train'), cell2mat(labels_train')];
+    [~, ~, ~, err_scar(:,i), kappa_scar(:,i), time_scar(:,i)] = SCARGC_1NN(X, win_size, win_size, length(unique(allclass2)));
     
-    disp('     >SML')
-    [err_sml25(:,i), kappa_sml25(:,i), time_sml25(:,i)] = incremental_learner(data_train, ...
-      data_test, labels_train, labels_test, model, 25, 'sml');
+%     disp('     >SML')
+%     [err_sml25(:,i), kappa_sml25(:,i), time_sml25(:,i)] = incremental_learner(data_train, ...
+%       data_test, labels_train, labels_test, model, 25, 'sml');
+%     
+%     disp('     >MLE')
+%     [err_mle25(:,i), kappa_mle25(:,i), time_mle25(:,i)] = incremental_learner(data_train, ...
+%       data_test, labels_train, labels_test, model, 25, 'mle');
+%     
+%     disp('     >MAP')
+%     [err_map25(:,i), kappa_map25(:,i), time_map25(:,i)] = incremental_learner(data_train, ...
+%       data_test, labels_train, labels_test, model, 25, 'map');
+%      
+%     disp('     >AVG1')
+%     [err_avg25(:,i), kappa_avg25(:,i), time_avg25(:,i)] = incremental_learner(data_train, ...
+%       data_test, labels_train, labels_test, model, 25, 'avg1');
+%     
+%     disp('     >AVG2')
+%     [err_avg_cor25(:,i), kappa_avg_cor25(:,i), time_avg_cor25(:,i)] = incremental_learner(data_train, ...
+%       data_test, labels_train, labels_test, model, 25, 'avg2');
+%     
+%     disp('     >CVX')
+%     [err_cvx25(:,i), kappa_cvx25(:,i), time_cvx25(:,i)] = cvx_learner(data_train, ...
+%       data_test, labels_train, labels_test, model, 25, alpha, beta);
     
-    disp('     >MLE')
-    [err_mle25(:,i), kappa_mle25(:,i), time_mle25(:,i)] = incremental_learner(data_train, ...
-      data_test, labels_train, labels_test, model, 25, 'mle');
-    
-    disp('     >MAP')
-    [err_map25(:,i), kappa_map25(:,i), time_map25(:,i)] = incremental_learner(data_train, ...
-      data_test, labels_train, labels_test, model, 25, 'map');
-     
-    disp('     >AVG1')
-    [err_avg25(:,i), kappa_avg25(:,i), time_avg25(:,i)] = incremental_learner(data_train, ...
-      data_test, labels_train, labels_test, model, 25, 'avg1');
-    
-    disp('     >AVG2')
-    [err_avg_cor25(:,i), kappa_avg_cor25(:,i), time_avg_cor25(:,i)] = incremental_learner(data_train, ...
-      data_test, labels_train, labels_test, model, 25, 'avg2');
-    
-    disp('     >CVX')
-    [err_cvx25(:,i), kappa_cvx25(:,i), time_cvx25(:,i)] = cvx_learner(data_train, ...
-      data_test, labels_train, labels_test, model, 25, alpha, beta);
     
   end
   
