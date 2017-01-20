@@ -18,7 +18,6 @@ addpath(genpath('SCARGC_codes/'));
 
 % free parameters of the experiement
 miss_amt = 2;         % percentange of missing training data 
-end_experiment = 0;   % test-then-train or test-on-last
 avg = 10;             % number of averages to perform  
 alpha = .7;           % exponential forgetting factor for CVX-sense
 beta = .5;            % convex combination parameter for CVX-sense
@@ -49,14 +48,12 @@ datasets = {
     'oocytes_merluccius_nucleus_4d.csv'
     'oocytes_trisopterus_nucleus_2f.csv'
     'pima.csv'
-    'ringnorm.csv'
     'spambase.csv'
     'statlog-australian-credit.csv'
     'statlog-german-credit.csv'
     'statlog-heart.csv'
     'tic-tac-toe.csv'
     'titanic.csv'
-    'twonorm.csv'
     'vertebral-column-2clases.csv'
   };
 % delete(gcp('nocreate'));
@@ -139,13 +136,8 @@ for dd = 1:length(datasets)
   % several of the models need to know the number of time stamps in
   % advance, so partition the data into a stream to determine the number of
   % batches in the data stream 
-  if end_experiment == 1
-    [data_train, data_test, labels_train, labels_test] = test_on_last(...
-      alldata, allclass, win_size, true);
-  else
-    [data_train, data_test, labels_train, labels_test] = test_then_train(...
-      alldata, allclass, win_size, true);
-  end
+  [data_train, data_test, labels_train, labels_test] = test_then_train(...
+    alldata, allclass, win_size, true);
   
   
   max_learners = length(data_train) + 1;
@@ -201,13 +193,8 @@ for dd = 1:length(datasets)
     allclass2 = allclass(shuffs);
   
     % split up the data into a training and testing data stream 
-    if end_experiment == 1
-      [data_train, data_test, labels_train, labels_test] = test_on_last(...
-        alldata2, allclass2, win_size, false);
-    else
-      [data_train, data_test, labels_train, labels_test] = test_then_train(...
-        alldata2, allclass2, win_size, false);
-    end
+    [data_train, data_test, labels_train, labels_test] = test_then_train(...
+      alldata2, allclass2, win_size, false);
     
     for z = 1:length(data_train)
     	if mod(z+miss_amt-1, miss_amt) ~= 0
@@ -262,7 +249,7 @@ for dd = 1:length(datasets)
   
   all_errors = mean([errors.avg, errors.ftl, errors.nse, errors.sml, errors.cvx]);
   all_kappas = mean([kappas.avg, kappas.ftl, kappas.nse, kappas.sml, kappas.cvx]);
-  save(['results/stationary_missing_', strrep(dat,'.csv', ''), '.mat']);
+  save(['results/stationary_missing_', num2str(miss_amt), '_',strrep(dat,'.csv', ''), '.mat']);
 end
 
 delete(gcp('nocreate'));
