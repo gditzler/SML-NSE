@@ -13,9 +13,8 @@ addpath('data/');
 addpath(genpath('SCARGC_codes/'));
 
 % free parameters of the experiement
-end_experiment = 0;   % test-then-train or test-on-last
 avg = 10;             % number of averages to perform  
-alpha = .7;           % exponential forgetting factor for CVX-sense
+alpha = .95;           % exponential forgetting factor for CVX-sense
 beta = .5;            % convex combination parameter for CVX-sense
 mclass = 2;
 
@@ -128,13 +127,8 @@ for dd = 1:length(datasets)
   % several of the models need to know the number of time stamps in
   % advance, so partition the data into a stream to determine the number of
   % batches in the data stream
-  if end_experiment == 1
-    [data_train, data_test, labels_train, labels_test] = test_on_last(...
-      alldata, allclass, win_size, true);
-  else
-    [data_train, data_test, labels_train, labels_test] = test_then_train(...
-      alldata, allclass, win_size, true);
-  end
+  [data_train, data_test, labels_train, labels_test] = test_then_train(...
+    alldata, allclass, win_size, true);
   
   
   max_learners = length(data_train) + 1;
@@ -190,13 +184,8 @@ for dd = 1:length(datasets)
     allclass2 = allclass(shuffs);
   
     % split up the data into a training and testing data stream
-    if end_experiment == 1
-      [data_train, data_test, labels_train, labels_test] = test_on_last(...
-        alldata2, allclass2, win_size, false);
-    else
-      [data_train, data_test, labels_train, labels_test] = test_then_train(...
-        alldata2, allclass2, win_size, false);
-    end
+    [data_train, data_test, labels_train, labels_test] = test_then_train(...
+      alldata2, allclass2, win_size, false);
 
     % follow the leader
     [err_ftl(:,i), kappa_ftl(:,i), time_ftl(:,i)] = follow_the_leader(netFTL, ...
@@ -234,11 +223,24 @@ for dd = 1:length(datasets)
         
   end
   
-  if end_experiment == 1
-    save(['../results/all_', strrep(dat,'.csv', ''), '_END_err_kappa.mat']);
-  else
-    save(['../results/all_', strrep(dat,'.csv', ''), '_err_kappa.mat']);
-  end
+  idx = 2:size(err_avg_cor, 1)-1;
+  errors.avg = nanmean(err_avg_cor(idx, :), 2);
+  errors.cvx = nanmean(err_cvx(idx, :), 2);
+  errors.ftl = nanmean(err_ftl(idx, :), 2);
+  errors.nse = nanmean(err_nse(idx, :), 2);
+  errors.sml = nanmean(err_sml(idx, :), 2);
+  errors.scar = nanmean(err_scar(idx, :), 2);
+  
+  kappas.avg = nanmean(kappa_avg_cor(idx, :), 2);
+  kappas.cvx = nanmean(kappa_cvx(idx, :), 2);
+  kappas.ftl = nanmean(kappa_ftl(idx, :), 2);
+  kappas.nse = nanmean(kappa_nse(idx, :), 2);
+  kappas.sml = nanmean(kappa_sml(idx, :), 2);
+  kappas.scar = nanmean(kappa_scar(idx, :), 2); 
+  
+  all_errors = mean([errors.avg, errors.ftl, errors.nse, errors.sml, errors.cvx, errors.scar]);
+  all_kappas = mean([kappas.avg, kappas.ftl, kappas.nse, kappas.sml, kappas.cvx, kappas.scar]);
+  save(['results/stationary_', strrep(dat,'.csv', ''), '.mat']);
 
 end
 
