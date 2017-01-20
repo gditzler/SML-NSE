@@ -13,7 +13,7 @@ addpath('data/');
 
 % free parameters of the experiement
 avg = 10;             % number of averages to perform  
-alpha = .7;           % exponential forgetting factor for CVX-sense
+alpha = .95;           % exponential forgetting factor for CVX-sense
 beta = .5;            % convex combination parameter for CVX-sense
 end_experiment = 0;   % test-then-train or test-on-last
 % parpool(4);
@@ -229,10 +229,28 @@ for dd = 1:length(dats)
       win_size, win_size, length(unique(allclass2)));    
   end
   
+  idx = 2:size(err_avg_cor, 1)-1;
+  errors.avg = nanmean(err_avg_cor(idx, :), 2);
+  errors.cvx = nanmean(err_cvx(idx, :), 2);
+  errors.ftl = nanmean(err_ftl(idx, :), 2);
+  errors.nse = nanmean(err_nse(idx, :), 2);
+  errors.sml = nanmean(err_sml(idx, :), 2);
+  errors.scar = nanmean(err_scar(idx, :), 2);
+  
+  kappas.avg = nanmean(kappa_avg_cor(idx, :), 2);
+  kappas.cvx = nanmean(kappa_cvx(idx, :), 2);
+  kappas.ftl = nanmean(kappa_ftl(idx, :), 2);
+  kappas.nse = nanmean(kappa_nse(idx, :), 2);
+  kappas.sml = nanmean(kappa_sml(idx, :), 2);
+  kappas.scar = nanmean(kappa_scar(idx, :), 2); 
+  
+  all_errors = mean([errors.avg, errors.ftl, errors.nse, errors.sml, errors.cvx, errors.scar]);
+  all_kappas = mean([kappas.avg, kappas.ftl, kappas.nse, kappas.sml, kappas.cvx, kappas.scar]);
+  
   if end_experiment == 1
-    save(['../results/nse_', dat, '_END_err_kappa.mat']);
+    save(['results/experiment_nse_', dat, '_testOnLast.mat']);
   else
-    save(['../results/nse_', dat, '_err_kappa.mat']);
+    save(['results/experiment_nse_', dat, '_testThenTrain.mat']);
   end
 
 end
