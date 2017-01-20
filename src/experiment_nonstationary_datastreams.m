@@ -226,7 +226,7 @@ for dd = 1:length(dats)
     % scargc
     X = [data_train{1}, labels_train{1}; cell2mat(data_train'), cell2mat(labels_train')];
     [~, ~, ~, err_scar(:,i), kappa_scar(:,i), time_scar(:,i)] = SCARGC_1NN(X, ...
-      win_size, win_size, length(unique(allclass2)));    
+      win_size, win_size, mclass);    
   end
   
   idx = 2:size(err_avg_cor, 1)-1;
