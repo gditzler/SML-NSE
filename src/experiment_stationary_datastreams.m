@@ -238,7 +238,7 @@ for dd = 1:length(datasets)
   
   all_errors = mean([errors.avg, errors.ftl, errors.nse, errors.sml, errors.cvx, errors.scar]);
   all_kappas = mean([kappas.avg, kappas.ftl, kappas.nse, kappas.sml, kappas.cvx, kappas.scar]);
-  save(['results/stationary_', strrep(dat,'.csv', ''), '.mat']);
+  save(['results/experiment_stationary_', strrep(dat,'.csv', ''), '.mat']);
 
 end
 

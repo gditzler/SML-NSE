@@ -249,7 +249,7 @@ for dd = 1:length(datasets)
   
   all_errors = mean([errors.avg, errors.ftl, errors.nse, errors.sml, errors.cvx]);
   all_kappas = mean([kappas.avg, kappas.ftl, kappas.nse, kappas.sml, kappas.cvx]);
-  save(['results/stationary_missing_', num2str(miss_amt), '_',strrep(dat,'.csv', ''), '.mat']);
+  save(['results/experiment_missing_stationary_', num2str(miss_amt), '_',strrep(dat,'.csv', ''), '.mat']);
 end
 
 delete(gcp('nocreate'));
