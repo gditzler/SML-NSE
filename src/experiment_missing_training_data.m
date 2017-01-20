@@ -17,7 +17,7 @@ addpath('data/');
 addpath(genpath('SCARGC_codes/'));
 
 % free parameters of the experiement
-miss_amt = 1;         % percentange of missing training data 
+miss_amt = 2;         % percentange of missing training data 
 end_experiment = 0;   % test-then-train or test-on-last
 avg = 10;             % number of averages to perform  
 alpha = .7;           % exponential forgetting factor for CVX-sense
@@ -190,7 +190,7 @@ for dd = 1:length(datasets)
   time_cvx = zeros(length(data_train), avg);
   time_scar = zeros(length(data_train), avg);
   
-  for i = 1:avg
+  parfor i = 1:avg
     disp(['  -Avg ', num2str(i), '/', num2str(avg)]);
     
     % since these are stationary data streams, we can permuate the entire
