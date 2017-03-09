@@ -248,9 +248,9 @@ for dd = 1:length(dats)
   all_kappas = mean([kappas.avg, kappas.ftl, kappas.nse, kappas.sml, kappas.cvx, kappas.scar]);
   
   if end_experiment == 1
-    save(['results/experiment_nse_', dat, '_testOnLast.mat']);
+    save(['../results/experiment_nse_', dat, '_testOnLast.mat']);
   else
-    save(['results/experiment_nse_', dat, '_testThenTrain.mat']);
+    save(['../results/experiment_nse_', dat, '_testThenTrain.mat']);
   end
 
 end
