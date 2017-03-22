@@ -10,6 +10,7 @@ close all;
 addpath('algorithms/');
 addpath('utils/');
 addpath('data/');
+addpath('SCARGC_codes'); 
 
 % free parameters of the experiement
 avg = 10;             % number of averages to perform  
@@ -45,7 +46,7 @@ for dd = 1:length(dats)
     allclass = alldata(:, 8);
     allclass = allclass + 1;
     alldata(:, 8) = [];
-    win_size = 1200;     
+    win_size = 5000;     
   elseif strcmp(dat,'poker')
     alldata = load('data/poker.arff');
     alldata(alldata(:, end) == 9, :) = [];
@@ -59,7 +60,7 @@ for dd = 1:length(dats)
     allclass = allclass + 1;
     allclass(allclass == 3) = 2;
     alldata(:, end) = [];
-    win_size = 2000; 
+    win_size = 5000; 
     mclass = 2;
     % figure; hold on
     % plot(find(allclass==1), cumsum(allclass(allclass==1)))

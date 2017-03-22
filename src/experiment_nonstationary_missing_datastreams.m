@@ -63,7 +63,7 @@ for dd = 1:length(datasets)
     allclass = alldata(:, 8);
     allclass = allclass + 1;
     alldata(:, 8) = [];
-    win_size = 1200;     
+    win_size = 5000;     
   elseif strcmp(dat,'poker')
     alldata = load('data/poker.arff');
     alldata(alldata(:, end) == 9, :) = [];
@@ -77,7 +77,7 @@ for dd = 1:length(datasets)
     allclass = allclass + 1;
     allclass(allclass == 3) = 2;
     alldata(:, end) = [];
-    win_size = 2000; 
+    win_size = 5000; 
     mclass = 2;
     % figure; hold on
     % plot(find(allclass==1), cumsum(allclass(allclass==1)))
@@ -93,7 +93,7 @@ for dd = 1:length(datasets)
     load elec2;
     alldata(3,:) = []; % remove the "cheating" features
     alldata(4,:) = []; 
-    win_size = 125;    % size of train / test batch
+    win_size = 200;    % size of train / test batch
     alldata = alldata';   % old format of data needs transpose
     allclass = allclass'; % ^^^^^
     mclass = 2;
