@@ -182,7 +182,7 @@ for dd = 1:length(datasets)
   time_cvx = zeros(length(data_train), avg);
   time_scar = zeros(length(data_train), avg);
   
-  for i = 1:avg
+  parfor i = 1:avg
     disp(['  -Avg ', num2str(i), '/', num2str(avg)]);
     
     % since these are stationary data streams, we can permuate the entire

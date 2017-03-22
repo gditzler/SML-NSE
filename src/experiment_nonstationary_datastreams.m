@@ -10,7 +10,7 @@ close all;
 addpath('algorithms/');
 addpath('utils/');
 addpath('data/');
-addpath('SCARGC_codes'); 
+addpath('SCARGC_codes/'); 
 
 % free parameters of the experiement
 avg = 10;             % number of averages to perform  
