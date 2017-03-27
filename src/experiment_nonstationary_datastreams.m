@@ -16,7 +16,7 @@ addpath('SCARGC_codes/');
 avg = 10;             % number of averages to perform  
 alpha = .95;           % exponential forgetting factor for CVX-sense
 beta = .5;            % convex combination parameter for CVX-sense
-end_experiment = 0;   % test-then-train or test-on-last
+end_experiment = 1;   % test-then-train or test-on-last
 % parpool(4);
 
 % data must be downloaded from the UAMLDA Gitlab data set repo 
