@@ -17,8 +17,8 @@ addpath('data/');
 addpath(genpath('SCARGC_codes/'));
 
 % free parameters of the experiement
-miss_amt = 1;         % percentange of missing training data 
-end_experiment = 1;   % test-then-train or test-on-last
+miss_amt = 2;         % percentange of missing training data 
+end_experiment = 0;   % test-then-train or test-on-last
 avg = 10;             % number of averages to perform  
 alpha = .7;           % exponential forgetting factor for CVX-sense
 beta = .5;            % convex combination parameter for CVX-sense
