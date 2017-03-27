@@ -17,8 +17,8 @@ addpath('data/');
 addpath(genpath('SCARGC_codes/'));
 
 % free parameters of the experiement
-miss_amt = 1;         % percentange of missing training data 
-end_experiment = 1;   % test-then-train or test-on-last
+miss_amt = 2;         % percentange of missing training data 
+end_experiment = 0;   % test-then-train or test-on-last
 avg = 10;             % number of averages to perform  
 alpha = .7;           % exponential forgetting factor for CVX-sense
 beta = .5;            % convex combination parameter for CVX-sense
@@ -261,7 +261,12 @@ for dd = 1:length(datasets)
       model, max_learners, 'avg2', 1);
     % cvx-sense
     [err_cvx(:,i), kappa_cvx(:,i), time_cvx(:,i)] = cvx_learner(data_train, ...
-      data_test, labels_train, labels_test, model, max_learners, alpha, beta, 1);        
+      data_test, labels_train, labels_test, model, max_learners, alpha, beta, 1);   
+    
+    % scargc
+    X = [data_train{1}, labels_train{1}; cell2mat(data_train'), cell2mat(labels_train')];
+    [~, ~, ~, err_scar(:,i), kappa_scar(:,i), time_scar(:,i)] = SCARGC_1NN(X, ...
+      win_size, win_size, mclass);    
   end
   
   idx = 2:size(err_avg_cor, 1)-1;
